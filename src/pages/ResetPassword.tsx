@@ -17,16 +17,27 @@ export default function ResetPassword() {
   useEffect(() => {
     const initRecovery = async () => {
       try {
-        const url = new URL(window.location.href);
-        const code = url.searchParams.get("code");
+        const hash = window.location.hash.startsWith("#")
+          ? window.location.hash.slice(1)
+          : window.location.hash;
 
-        if (code) {
-          const { error } = await supabase.auth.exchangeCodeForSession(code);
+        if (hash) {
+          const hashParams = new URLSearchParams(hash);
+          const accessToken = hashParams.get("access_token");
+          const refreshToken = hashParams.get("refresh_token");
+          const type = hashParams.get("type");
 
-          if (error) {
-            setMessage("Link inválido ou expirado.");
-            setInitializing(false);
-            return;
+          if (type === "recovery" && accessToken && refreshToken) {
+            const { error } = await supabase.auth.setSession({
+              access_token: accessToken,
+              refresh_token: refreshToken,
+            });
+
+            if (error) {
+              setMessage("Link inválido ou expirado.");
+              setInitializing(false);
+              return;
+            }
           }
         }
 
