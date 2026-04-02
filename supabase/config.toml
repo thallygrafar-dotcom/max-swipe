@@ -1,0 +1,19 @@
+project_id = "qvsklcbfcqshswihldxz"
+
+[functions.generate-ad]
+verify_jwt = false
+
+[functions.analyze-vsl]
+verify_jwt = false
+
+[functions.analyze-copy]
+verify_jwt = false
+
+[functions.cluster-angles]
+verify_jwt = false
+
+[functions.build-bridge]
+verify_jwt = false
+
+[functions.analyze-terms]
+verify_jwt = false
