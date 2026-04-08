@@ -32,6 +32,7 @@ type DbSwipeItem = {
   image_url: string | null;
   vsl_url: string | null;
   transcription_url: string | null;
+  invisible_structure_url: string | null;
   ads_count: number | null;
   tags: string | null;
   published: boolean | null;
@@ -49,6 +50,7 @@ type SwipeItem = {
   imageUrl: string;
   vslUrl: string;
   transcriptionUrl: string;
+  invisibleStructureUrl: string;
   adsCount: number;
   tags: string;
   published: boolean;
@@ -65,6 +67,7 @@ type SwipeFormData = {
   imageUrl: string;
   vslUrl: string;
   transcriptionUrl: string;
+  invisibleStructureUrl: string;
   adsCount: string;
   tags: string;
   published: boolean;
@@ -81,6 +84,7 @@ const defaultForm: SwipeFormData = {
   imageUrl: "",
   vslUrl: "",
   transcriptionUrl: "",
+  invisibleStructureUrl: "",
   adsCount: "",
   tags: "",
   published: true,
@@ -129,6 +133,7 @@ function mapDbItemToSwipeItem(item: DbSwipeItem): SwipeItem {
     imageUrl: item.image_url ?? "",
     vslUrl: item.vsl_url ?? "",
     transcriptionUrl: item.transcription_url ?? "",
+    invisibleStructureUrl: item.invisible_structure_url ?? "",
     adsCount: item.ads_count ?? 0,
     tags: item.tags ?? "",
     published: item.published ?? false,
@@ -212,6 +217,7 @@ export default function SwipeMaxAdmin() {
       imageUrl: item.imageUrl,
       vslUrl: item.vslUrl,
       transcriptionUrl: item.transcriptionUrl,
+      invisibleStructureUrl: item.invisibleStructureUrl,
       adsCount: String(item.adsCount),
       tags: item.tags,
       published: item.published,
@@ -257,6 +263,7 @@ export default function SwipeMaxAdmin() {
         "https://via.placeholder.com/1200x800?text=SwipeMAX",
       vsl_url: form.vslUrl.trim(),
       transcription_url: form.transcriptionUrl.trim(),
+      invisible_structure_url: form.invisibleStructureUrl.trim(),
       ads_count: Number(form.adsCount) || 0,
       tags: form.tags.trim(),
       published: form.published,
@@ -554,6 +561,20 @@ export default function SwipeMaxAdmin() {
                         </div>
                       )}
 
+                      {item.invisibleStructureUrl && (
+                        <div className="mt-2">
+                          <a
+                            href={item.invisibleStructureUrl}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="inline-flex items-center gap-2 text-sm text-zinc-300 transition hover:text-white"
+                          >
+                            <LinkIcon className="h-4 w-4" />
+                            Estrutura Invisível
+                          </a>
+                        </div>
+                      )}
+
                       {item.tags.trim().length > 0 && (
                         <div className="mt-2 flex flex-wrap gap-2">
                           {item.tags
@@ -767,6 +788,31 @@ export default function SwipeMaxAdmin() {
                           }))
                         }
                         placeholder="https://..."
+                        className="
+                          h-[44px] w-full rounded-2xl border border-white/10 bg-white/[0.03]
+                          pl-11 pr-4 text-sm text-white outline-none
+                          placeholder:text-muted-foreground
+                          transition-all duration-300
+                          focus:border-primary/30 focus:bg-white/[0.05]
+                        "
+                      />
+                    </div>
+                  </Field>
+                </div>
+
+                <div className="md:col-span-2">
+                  <Field label="URL da Estrutura Invisível">
+                    <div className="relative">
+                      <LinkIcon className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                      <input
+                        value={form.invisibleStructureUrl}
+                        onChange={(e) =>
+                          setForm((prev) => ({
+                            ...prev,
+                            invisibleStructureUrl: e.target.value,
+                          }))
+                        }
+                        placeholder="https://docs.google.com/..."
                         className="
                           h-[44px] w-full rounded-2xl border border-white/10 bg-white/[0.03]
                           pl-11 pr-4 text-sm text-white outline-none
