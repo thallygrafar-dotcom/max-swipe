@@ -7,6 +7,7 @@ import { useAuth } from "./hooks/useAuth";
 import Signup from "./pages/Signup";
 import AdminUsers from "./pages/AdminUsers";
 import ResetPassword from "./pages/ResetPassword";
+import DTC from "./pages/Dtc";
 
 function LoadingScreen() {
   return (
@@ -86,6 +87,15 @@ function AppRoutes() {
 />
 
 <Route path="/reset-password" element={<ResetPassword />} />
+
+<Route
+  path="/dtc"
+  element={
+    <ProtectedRoute>
+      <DTC />
+    </ProtectedRoute>
+  }
+/>
 
       <Route
         path="/swipe-max-admin"

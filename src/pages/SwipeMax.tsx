@@ -390,7 +390,7 @@ setLoadingPlan(false);
                 description="Monte sua DTC com acesso premium direto pela dashboard."
                 icon={<LayoutTemplate className="h-5 w-5" />}
                 isAnnual={isAnnual}
-                onClick={() => handlePremiumRoute("/dtc-builder")}
+                onClick={() => handlePremiumRoute("/dtc")}
               />
 
               <PremiumBanner

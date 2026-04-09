@@ -12,6 +12,7 @@ import {
 import { useAuth } from '@/hooks/useAuth';
 import ProfileModal from '@/components/ProfileModal';
 import { supabase } from '@/integrations/supabase/client';
+import { useNavigate } from "react-router-dom";
 
 interface GlobalHeaderProps {
   onToggleSidebar?: () => void;
@@ -37,6 +38,7 @@ const GlobalHeader = ({
   const [userPlan, setUserPlan] = useState<UserPlan>(null);
   const [loadingPlan, setLoadingPlan] = useState(true);
   const [profileModalOpen, setProfileModalOpen] = useState(false);
+  const navigate = useNavigate();
 
   const userMenuRef = useRef<HTMLDivElement | null>(null);
   const hamburgerMenuRef = useRef<HTMLDivElement | null>(null);
@@ -258,7 +260,10 @@ const GlobalHeader = ({
                   
                   <button
                     type="button"
-                    onClick={() => handleComingSoon('DTC Builder')}
+                    onClick={() => {
+  navigate("/dtc");
+  setHamburgerMenuOpen(false);
+}}
                     className="group flex w-full items-center justify-between rounded-[22px] px-3 py-3 text-left transition-all duration-200 hover:bg-white/[0.05]"
                   >
                     <div className="flex items-center gap-3">
@@ -323,9 +328,10 @@ const GlobalHeader = ({
         {/* CENTER */}
         <div className="absolute left-1/2 top-1/2 flex -translate-x-1/2 -translate-y-1/2">
           <button
-            type="button"
-            className="select-none text-[30px] font-black leading-none tracking-[-0.05em] sm:text-[36px]"
-          >
+  type="button"
+  onClick={() => navigate("/swipe-max")}
+  className="select-none text-[30px] font-black leading-none tracking-[-0.05em] sm:text-[36px] cursor-pointer"
+>
             <span className="text-white">Swipe</span>
             <span className="text-[#ff4b4b]">MAX</span>
           </button>
