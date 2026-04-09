@@ -376,25 +376,7 @@ setLoadingPlan(false);
                 </div>
 
                 <div className="flex items-center gap-3">
-                  <div
-                    className={`inline-flex items-center gap-2 rounded-full border px-4 py-2 text-xs font-semibold ${
-                      isAnnual
-                        ? "border-amber-400/20 bg-amber-400/10 text-amber-200"
-                        : "border-white/10 bg-white/[0.04] text-zinc-300"
-                    }`}
-                  >
-                    {isAnnual ? (
-                      <>
-                        <Crown className="h-4 w-4" />
-                        Plano Anual
-                      </>
-                    ) : (
-                      <>
-                        <Lock className="h-4 w-4" />
-                        Plano Mensal
-                      </>
-                    )}
-                  </div>
+                  
                 </div>
               </div>
             </section>
