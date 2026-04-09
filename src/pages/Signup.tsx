@@ -111,8 +111,8 @@ export default function Signup() {
       </div>
 
       <div className="flex w-full items-center justify-center bg-[#f5f5f5] px-6 lg:w-1/2">
-        <div className="w-full max-w-xl rounded-[30px] bg-white p-8 shadow-[0_25px_70px_rgba(0,0,0,0.14)]">
-          <div className="mb-6">
+        <div className="w-full max-w-xl scale-[0.82] rounded-[30px] bg-white p-6 shadow-[0_25px_70px_rgba(0,0,0,0.14)]">
+          <div className="mb-4">
             <h2 className="text-[38px] font-semibold text-black">
               Criar sua conta
             </h2>

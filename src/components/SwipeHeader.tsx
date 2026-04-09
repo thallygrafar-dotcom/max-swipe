@@ -255,6 +255,7 @@ const GlobalHeader = ({
                 </div>
 
                 <div className="relative p-2">
+                  
                   <button
                     type="button"
                     onClick={() => handleComingSoon('DTC Builder')}
@@ -378,14 +379,41 @@ const GlobalHeader = ({
 
                 <div className="relative p-2">
                   <button
+  type="button"
+  onClick={() =>
+    window.open("https://wa.me/551153042433", "_blank", "noopener,noreferrer")
+  }
+  className="flex w-full items-center justify-between rounded-[22px] px-4 py-4 text-left text-white transition-all duration-200 hover:bg-green-500/10 hover:text-green-400"
+>
+  <div className="flex items-center gap-3">
+    
+    {/* Ícone WhatsApp */}
+    <div className="flex h-10 w-10 items-center justify-center rounded-[14px] border border-green-500/20 bg-green-500/10">
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 32 32"
+        className="h-5 w-5 fill-green-400"
+      >
+        <path d="M16 .396C7.163.396 0 7.56 0 16.396c0 2.885.754 5.593 2.07 7.94L.16 31.64l7.528-1.878a15.94 15.94 0 0 0 8.312 2.285c8.837 0 16-7.164 16-16S24.837.396 16 .396zm0 29.29c-2.52 0-4.873-.684-6.9-1.874l-.493-.29-4.466 1.114 1.19-4.356-.32-.507A13.79 13.79 0 0 1 2.2 16.396c0-7.61 6.19-13.8 13.8-13.8s13.8 6.19 13.8 13.8-6.19 13.8-13.8 13.8zm7.63-10.36c-.417-.208-2.466-1.216-2.848-1.354-.38-.14-.658-.208-.935.208-.277.417-1.073 1.354-1.317 1.633-.243.277-.486.312-.903.104-.417-.208-1.762-.65-3.357-2.072-1.24-1.105-2.078-2.47-2.322-2.887-.243-.417-.026-.643.183-.85.188-.187.417-.486.625-.73.208-.243.277-.417.417-.695.14-.277.07-.52-.035-.73-.104-.208-.935-2.255-1.28-3.09-.336-.806-.678-.697-.935-.71l-.797-.014c-.277 0-.73.104-1.11.52-.38.417-1.456 1.423-1.456 3.466s1.49 4.02 1.698 4.297c.208.277 2.933 4.477 7.104 6.278.994.43 1.77.686 2.375.878.997.317 1.905.272 2.623.165.8-.12 2.466-1.008 2.814-1.982.347-.973.347-1.806.243-1.982-.104-.174-.38-.277-.797-.486z"/>
+      </svg>
+    </div>
+
+    <span className="text-[16px]">Suporte</span>
+  </div>
+</button>
+                  <button
                     type="button"
                     onClick={handleProfileClick}
                     className="flex w-full items-center justify-between rounded-[22px] px-4 py-4 text-left text-white transition-all duration-200 hover:bg-white/[0.05]"
                   >
                     <div className="flex items-center gap-3">
-                      <User size={20} />
-                      <span className="text-[16px]">Perfil</span>
-                    </div>
+
+  <div className="flex h-10 w-10 items-center justify-center rounded-[14px] border border-yellow-500/20 bg-yellow-500/10 text-yellow-400">
+  <User size={18} />
+</div>
+
+  <span className="text-[16px]">Perfil</span>
+</div>
 
                     
                   </button>
