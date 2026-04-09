@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/hooks/useAuth";
 import SwipeHeader from "@/components/SwipeHeader";
+import SwipeFooter from "@/components/SwipeFooter";
 import {
   Search,
   BarChart3,
@@ -123,6 +124,8 @@ function getSafeTimestamp(dateString: string) {
 function normalizeUserPlan(planValue: string | null | undefined): UserPlan {
   return planValue === "annual" ? "annual" : "monthly";
 }
+
+
 
 export default function SwipeMax() {
   const navigate = useNavigate();
@@ -643,6 +646,9 @@ setLoadingPlan(false);
           </div>
         </div>
       </div>
+
+        <SwipeFooter />
+
 
       {showPricingModal ? (
         <PricingModal

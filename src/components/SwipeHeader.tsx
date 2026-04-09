@@ -10,6 +10,7 @@ import {
   Sparkles,
 } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
+import ProfileModal from '@/components/ProfileModal';
 import { supabase } from '@/integrations/supabase/client';
 
 interface GlobalHeaderProps {
@@ -35,6 +36,7 @@ const GlobalHeader = ({
   const [hamburgerMenuOpen, setHamburgerMenuOpen] = useState(false);
   const [userPlan, setUserPlan] = useState<UserPlan>(null);
   const [loadingPlan, setLoadingPlan] = useState(true);
+  const [profileModalOpen, setProfileModalOpen] = useState(false);
 
   const userMenuRef = useRef<HTMLDivElement | null>(null);
   const hamburgerMenuRef = useRef<HTMLDivElement | null>(null);
@@ -210,9 +212,9 @@ const GlobalHeader = ({
   };
 
   const handleProfileClick = () => {
-    alert('Perfil em breve 🚀');
-    setUserMenuOpen(false);
-  };
+  setProfileModalOpen(true);
+  setUserMenuOpen(false);
+};
 
   return (
     <header className="sticky top-0 z-50 h-[78px] border-b border-white/10 bg-[#050816]">
@@ -404,6 +406,14 @@ const GlobalHeader = ({
           </div>
         </div>
       </div>
+
+            <ProfileModal
+  open={profileModalOpen}
+  onClose={() => setProfileModalOpen(false)}
+  user={user}
+  plan={formattedPlan}
+/>
+
     </header>
   );
 };
