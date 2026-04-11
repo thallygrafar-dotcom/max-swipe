@@ -8,6 +8,10 @@ import Signup from "./pages/Signup";
 import AdminUsers from "./pages/AdminUsers";
 import ResetPassword from "./pages/ResetPassword";
 import DTC from "./pages/Dtc";
+import VslBuilder from "./pages/VslBuilder.tsx";
+import PaginaAdvertorial from "./pages/PaginaAdvertorial";
+import Ferramentas from "@/pages/Ferramentas";
+
 
 function LoadingScreen() {
   return (
@@ -76,6 +80,12 @@ function AppRoutes() {
     </PublicRoute>
   }
 />
+
+<Route path="/ferramentas" element={<Ferramentas />} />
+
+<Route path="/vsl-builder" element={<VslBuilder />} />
+
+<Route path="/pagina-advertorial" element={<PaginaAdvertorial />} />
 
 <Route
   path="/admin-users"

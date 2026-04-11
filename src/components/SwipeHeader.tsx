@@ -6,8 +6,10 @@ import {
   Crown,
   WalletCards,
   FileText,
-  CircleDollarSign,
   Sparkles,
+  Wand2,
+  LayoutTemplate,
+  Lock,
 } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import ProfileModal from '@/components/ProfileModal';
@@ -25,6 +27,7 @@ type SubscriptionRow = {
   plan_type?: string | null;
   email?: string | null;
   created_at?: string | null;
+  access_expires_at?: string | null;
 };
 
 const GlobalHeader = ({
@@ -79,6 +82,8 @@ const GlobalHeader = ({
     return 'Sem plano ativo';
   }, [userPlan]);
 
+  const isAnnual = userPlan === 'annual';
+
   useEffect(() => {
     const normalizePlan = (value?: string | null): UserPlan => {
       const plan = String(value || '')
@@ -103,10 +108,9 @@ const GlobalHeader = ({
         const sb = supabase as any;
         let rows: SubscriptionRow[] = [];
 
-        // tentativa 1: email exato
         const exactResult = await sb
           .from('swipemax_subscriptions')
-          .select('email, plan_type, created_at')
+          .select('email, plan_type, created_at, access_expires_at')
           .eq('email', trimmedEmail)
           .order('created_at', { ascending: false });
 
@@ -118,11 +122,10 @@ const GlobalHeader = ({
           rows = exactResult.data;
         }
 
-        // tentativa 2: lowercase
         if (rows.length === 0 && loweredEmail !== trimmedEmail) {
           const lowerResult = await sb
             .from('swipemax_subscriptions')
-            .select('email, plan_type, created_at')
+            .select('email, plan_type, created_at, access_expires_at')
             .eq('email', loweredEmail)
             .order('created_at', { ascending: false });
 
@@ -135,11 +138,10 @@ const GlobalHeader = ({
           }
         }
 
-        // tentativa 3: ilike
         if (rows.length === 0) {
           const ilikeResult = await sb
             .from('swipemax_subscriptions')
-            .select('email, plan_type, created_at')
+            .select('email, plan_type, created_at, access_expires_at')
             .ilike('email', loweredEmail)
             .order('created_at', { ascending: false });
 
@@ -153,13 +155,27 @@ const GlobalHeader = ({
         }
 
         const chosenRow =
-          rows.find((row) => normalizePlan(row.plan_type) !== null) ?? null;
+          rows.find((row) => {
+            const plan = normalizePlan(row.plan_type);
+            const hasAccess =
+              !!row.access_expires_at &&
+              new Date(row.access_expires_at).getTime() > Date.now();
 
-        console.log('Auth email:', trimmedEmail);
-        console.log('Rows encontradas:', rows);
-        console.log('Row escolhida:', chosenRow);
+            return plan !== null && hasAccess;
+          }) ??
+          rows.find((row) => normalizePlan(row.plan_type) !== null) ??
+          null;
 
         if (!chosenRow) {
+          setUserPlan(null);
+          return;
+        }
+
+        const hasAccess =
+          !!chosenRow.access_expires_at &&
+          new Date(chosenRow.access_expires_at).getTime() > Date.now();
+
+        if (!hasAccess) {
           setUserPlan(null);
           return;
         }
@@ -208,20 +224,20 @@ const GlobalHeader = ({
     };
   }, []);
 
-  const handleComingSoon = (label: string) => {
-    alert(`${label} em breve 🚀`);
-    setHamburgerMenuOpen(false);
+  const handleProfileClick = () => {
+    setProfileModalOpen(true);
+    setUserMenuOpen(false);
   };
 
-  const handleProfileClick = () => {
-  setProfileModalOpen(true);
-  setUserMenuOpen(false);
-};
+  const handleToolsHubClick = () => {
+    navigate("/ferramentas");
+    window.scrollTo(0, 0);
+    setHamburgerMenuOpen(false);
+  };
 
   return (
     <header className="sticky top-0 z-50 h-[78px] border-b border-white/10 bg-[#050816]">
       <div className="relative mx-auto flex h-full max-w-[1440px] items-center justify-between px-4 sm:px-6">
-        {/* LEFT */}
         <div className="flex items-center gap-3">
           <div className="relative" ref={hamburgerMenuRef}>
             {showSidebarToggle && (
@@ -241,49 +257,26 @@ const GlobalHeader = ({
             )}
 
             {hamburgerMenuOpen && (
-              <div className="absolute left-0 top-[calc(100%+12px)] z-[80] w-[320px] overflow-hidden rounded-[28px] border border-white/10 bg-[rgba(7,10,22,0.97)] shadow-[0_30px_90px_rgba(0,0,0,0.60)] backdrop-blur-[34px]">
+              <div className="absolute left-0 top-[calc(100%+12px)] z-[80] w-[340px] overflow-hidden rounded-[28px] border border-white/10 bg-[rgba(7,10,22,0.97)] shadow-[0_30px_90px_rgba(0,0,0,0.60)] backdrop-blur-[34px]">
                 <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(255,70,70,0.09),transparent_30%),radial-gradient(circle_at_bottom_right,rgba(59,130,246,0.12),transparent_35%)]" />
 
                 <div className="relative border-b border-white/10 px-5 py-4">
                   <div className="mb-1 flex items-center gap-2">
                     <Sparkles size={15} className="text-[#ff4b4b]" />
                     <p className="text-[15px] font-semibold text-white">
-                      Acesso rápido
+                      Ferramentas Premium
                     </p>
                   </div>
-                  <p className="text-sm text-zinc-400">
-                    SwipeMAX
+
+                  <p className="text-sm leading-6 text-zinc-400">
+                    Acesse páginas e builders prontos para editar.
                   </p>
                 </div>
 
                 <div className="relative p-2">
-                  
                   <button
                     type="button"
-                    onClick={() => {
-  navigate("/dtc");
-  setHamburgerMenuOpen(false);
-}}
-                    className="group flex w-full items-center justify-between rounded-[22px] px-3 py-3 text-left transition-all duration-200 hover:bg-white/[0.05]"
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className="flex h-11 w-11 items-center justify-center rounded-[16px] border border-white/10 bg-white/[0.04] text-zinc-100">
-                        <WalletCards size={18} />
-                      </div>
-                      <div>
-                        <p className="text-sm font-medium text-white">
-                          DTC Builder
-                        </p>
-                  
-                      </div>
-                    </div>
-
-                   
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => handleComingSoon('VSL Builder')}
+                    onClick={handleToolsHubClick}
                     className="group flex w-full items-center justify-between rounded-[22px] px-3 py-3 text-left transition-all duration-200 hover:bg-white/[0.05]"
                   >
                     <div className="flex items-center gap-3">
@@ -292,52 +285,107 @@ const GlobalHeader = ({
                       </div>
                       <div>
                         <p className="text-sm font-medium text-white">
-                          VSL Builder
+                          Página Advertorial
+                        </p>
+                        <p className="text-xs text-zinc-500">
+                          Hub de ferramentas premium
                         </p>
                       </div>
                     </div>
 
-                    
+                    {!loadingPlan && !isAnnual ? (
+                      <Lock size={16} className="text-zinc-500" />
+                    ) : null}
                   </button>
 
                   <button
                     type="button"
-                    onClick={() => handleComingSoon('Solicitar CPA de $180')}
+                    onClick={handleToolsHubClick}
                     className="group flex w-full items-center justify-between rounded-[22px] px-3 py-3 text-left transition-all duration-200 hover:bg-white/[0.05]"
                   >
                     <div className="flex items-center gap-3">
-                      <div className="flex h-11 w-11 items-center justify-center rounded-[16px] border border-emerald-500/20 bg-emerald-500/10 text-emerald-400">
-                        <CircleDollarSign size={18} />
+                      <div className="flex h-11 w-11 items-center justify-center rounded-[16px] border border-white/10 bg-white/[0.04] text-zinc-100">
+                        <Wand2 size={18} />
                       </div>
                       <div>
                         <p className="text-sm font-medium text-white">
-                          Solicitar CPA de $180
+                          VSL Builder
                         </p>
-                        
+                        <p className="text-xs text-zinc-500">
+                          Hub de ferramentas premium
+                        </p>
                       </div>
                     </div>
 
-                    
+                    {!loadingPlan && !isAnnual ? (
+                      <Lock size={16} className="text-zinc-500" />
+                    ) : null}
                   </button>
+
+                  <button
+                    type="button"
+                    onClick={handleToolsHubClick}
+                    className="group flex w-full items-center justify-between rounded-[22px] px-3 py-3 text-left transition-all duration-200 hover:bg-white/[0.05]"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="flex h-11 w-11 items-center justify-center rounded-[16px] border border-white/10 bg-white/[0.04] text-zinc-100">
+                        <LayoutTemplate size={18} />
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium text-white">
+                          DTC Builder
+                        </p>
+                        <p className="text-xs text-zinc-500">
+                          Hub de ferramentas premium
+                        </p>
+                      </div>
+                    </div>
+
+                    {!loadingPlan && !isAnnual ? (
+                      <Lock size={16} className="text-zinc-500" />
+                    ) : null}
+                  </button>
+
+                  <div className="mt-2 px-3 pb-2 pt-1">
+                    <button
+                      type="button"
+                      onClick={handleToolsHubClick}
+                      className={`inline-flex h-11 w-full items-center justify-center gap-2 rounded-[18px] border text-sm font-semibold transition-all duration-200 ${
+                        isAnnual
+                          ? "border-red-500/30 bg-red-500/10 text-white hover:border-red-500/50 hover:bg-red-500/16"
+                          : "border-white/10 bg-white/[0.04] text-zinc-300 hover:border-white/15 hover:bg-white/[0.06]"
+                      }`}
+                    >
+                      {isAnnual ? (
+                        <>
+                          <Sparkles size={16} />
+                          Acessar ferramentas
+                        </>
+                      ) : (
+                        <>
+                          <Lock size={16} />
+                          Ver ferramentas
+                        </>
+                      )}
+                    </button>
+                  </div>
                 </div>
               </div>
             )}
           </div>
         </div>
 
-        {/* CENTER */}
         <div className="absolute left-1/2 top-1/2 flex -translate-x-1/2 -translate-y-1/2">
           <button
-  type="button"
-  onClick={() => navigate("/swipe-max")}
-  className="select-none text-[30px] font-black leading-none tracking-[-0.05em] sm:text-[36px] cursor-pointer"
->
+            type="button"
+            onClick={() => navigate("/swipe-max")}
+            className="cursor-pointer select-none text-[30px] font-black leading-none tracking-[-0.05em] sm:text-[36px]"
+          >
             <span className="text-white">Swipe</span>
             <span className="text-[#ff4b4b]">MAX</span>
           </button>
         </div>
 
-        {/* RIGHT */}
         <div className="ml-auto flex items-center gap-3">
           <div className="hidden h-11 items-center rounded-[20px] border border-red-500/20 bg-[rgba(32,10,18,0.92)] px-4 text-sm text-zinc-100 shadow-[0_0_30px_rgba(255,75,75,0.10)] backdrop-blur-[20px] md:flex">
             <span className="mr-2 inline-block h-2.5 w-2.5 rounded-full bg-emerald-400 shadow-[0_0_14px_rgba(74,222,128,0.95)]" />
@@ -385,43 +433,39 @@ const GlobalHeader = ({
 
                 <div className="relative p-2">
                   <button
-  type="button"
-  onClick={() =>
-    window.open("https://wa.me/551153042433", "_blank", "noopener,noreferrer")
-  }
-  className="flex w-full items-center justify-between rounded-[22px] px-4 py-4 text-left text-white transition-all duration-200 hover:bg-green-500/10 hover:text-green-400"
->
-  <div className="flex items-center gap-3">
-    
-    {/* Ícone WhatsApp */}
-    <div className="flex h-10 w-10 items-center justify-center rounded-[14px] border border-green-500/20 bg-green-500/10">
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        viewBox="0 0 32 32"
-        className="h-5 w-5 fill-green-400"
-      >
-        <path d="M16 .396C7.163.396 0 7.56 0 16.396c0 2.885.754 5.593 2.07 7.94L.16 31.64l7.528-1.878a15.94 15.94 0 0 0 8.312 2.285c8.837 0 16-7.164 16-16S24.837.396 16 .396zm0 29.29c-2.52 0-4.873-.684-6.9-1.874l-.493-.29-4.466 1.114 1.19-4.356-.32-.507A13.79 13.79 0 0 1 2.2 16.396c0-7.61 6.19-13.8 13.8-13.8s13.8 6.19 13.8 13.8-6.19 13.8-13.8 13.8zm7.63-10.36c-.417-.208-2.466-1.216-2.848-1.354-.38-.14-.658-.208-.935.208-.277.417-1.073 1.354-1.317 1.633-.243.277-.486.312-.903.104-.417-.208-1.762-.65-3.357-2.072-1.24-1.105-2.078-2.47-2.322-2.887-.243-.417-.026-.643.183-.85.188-.187.417-.486.625-.73.208-.243.277-.417.417-.695.14-.277.07-.52-.035-.73-.104-.208-.935-2.255-1.28-3.09-.336-.806-.678-.697-.935-.71l-.797-.014c-.277 0-.73.104-1.11.52-.38.417-1.456 1.423-1.456 3.466s1.49 4.02 1.698 4.297c.208.277 2.933 4.477 7.104 6.278.994.43 1.77.686 2.375.878.997.317 1.905.272 2.623.165.8-.12 2.466-1.008 2.814-1.982.347-.973.347-1.806.243-1.982-.104-.174-.38-.277-.797-.486z"/>
-      </svg>
-    </div>
+                    type="button"
+                    onClick={() =>
+                      window.open("https://wa.me/551153042433", "_blank", "noopener,noreferrer")
+                    }
+                    className="flex w-full items-center justify-between rounded-[22px] px-4 py-4 text-left text-white transition-all duration-200 hover:bg-green-500/10 hover:text-green-400"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="flex h-10 w-10 items-center justify-center rounded-[14px] border border-green-500/20 bg-green-500/10">
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          viewBox="0 0 32 32"
+                          className="h-5 w-5 fill-green-400"
+                        >
+                          <path d="M16 .396C7.163.396 0 7.56 0 16.396c0 2.885.754 5.593 2.07 7.94L.16 31.64l7.528-1.878a15.94 15.94 0 0 0 8.312 2.285c8.837 0 16-7.164 16-16S24.837.396 16 .396zm0 29.29c-2.52 0-4.873-.684-6.9-1.874l-.493-.29-4.466 1.114 1.19-4.356-.32-.507A13.79 13.79 0 0 1 2.2 16.396c0-7.61 6.19-13.8 13.8-13.8s13.8 6.19 13.8 13.8-6.19 13.8-13.8 13.8zm7.63-10.36c-.417-.208-2.466-1.216-2.848-1.354-.38-.14-.658-.208-.935.208-.277.417-1.073 1.354-1.317 1.633-.243.277-.486.312-.903.104-.417-.208-1.762-.65-3.357-2.072-1.24-1.105-2.078-2.47-2.322-2.887-.243-.417-.026-.643.183-.85.188-.187.417-.486.625-.73.208-.243.277-.417.417-.695.14-.277.07-.52-.035-.73-.104-.208-.935-2.255-1.28-3.09-.336-.806-.678-.697-.935-.71l-.797-.014c-.277 0-.73.104-1.11.52-.38.417-1.456 1.423-1.456 3.466s1.49 4.02 1.698 4.297c.208.277 2.933 4.477 7.104 6.278.994.43 1.77.686 2.375.878.997.317 1.905.272 2.623.165.8-.12 2.466-1.008 2.814-1.982.347-.973.347-1.806.243-1.982-.104-.174-.38-.277-.797-.486z"/>
+                        </svg>
+                      </div>
 
-    <span className="text-[16px]">Suporte</span>
-  </div>
-</button>
+                      <span className="text-[16px]">Suporte</span>
+                    </div>
+                  </button>
+
                   <button
                     type="button"
                     onClick={handleProfileClick}
                     className="flex w-full items-center justify-between rounded-[22px] px-4 py-4 text-left text-white transition-all duration-200 hover:bg-white/[0.05]"
                   >
                     <div className="flex items-center gap-3">
+                      <div className="flex h-10 w-10 items-center justify-center rounded-[14px] border border-yellow-500/20 bg-yellow-500/10 text-yellow-400">
+                        <User size={18} />
+                      </div>
 
-  <div className="flex h-10 w-10 items-center justify-center rounded-[14px] border border-yellow-500/20 bg-yellow-500/10 text-yellow-400">
-  <User size={18} />
-</div>
-
-  <span className="text-[16px]">Perfil</span>
-</div>
-
-                    
+                      <span className="text-[16px]">Perfil</span>
+                    </div>
                   </button>
                 </div>
 
@@ -441,13 +485,12 @@ const GlobalHeader = ({
         </div>
       </div>
 
-            <ProfileModal
-  open={profileModalOpen}
-  onClose={() => setProfileModalOpen(false)}
-  user={user}
-  plan={formattedPlan}
-/>
-
+      <ProfileModal
+        open={profileModalOpen}
+        onClose={() => setProfileModalOpen(false)}
+        user={user}
+        plan={formattedPlan}
+      />
     </header>
   );
 };
