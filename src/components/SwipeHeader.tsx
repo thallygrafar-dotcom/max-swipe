@@ -15,6 +15,7 @@ import { useAuth } from '@/hooks/useAuth';
 import ProfileModal from '@/components/ProfileModal';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from "react-router-dom";
+import HeaderNotifications from "@/components/HeaderNotifications";
 
 interface GlobalHeaderProps {
   onToggleSidebar?: () => void;
@@ -387,10 +388,8 @@ const GlobalHeader = ({
         </div>
 
         <div className="ml-auto flex items-center gap-3">
-          <div className="hidden h-11 items-center rounded-[20px] border border-red-500/20 bg-[rgba(32,10,18,0.92)] px-4 text-sm text-zinc-100 shadow-[0_0_30px_rgba(255,75,75,0.10)] backdrop-blur-[20px] md:flex">
-            <span className="mr-2 inline-block h-2.5 w-2.5 rounded-full bg-emerald-400 shadow-[0_0_14px_rgba(74,222,128,0.95)]" />
-            {loadingPlan ? 'Carregando plano...' : formattedPlan}
-          </div>
+          
+          <HeaderNotifications />
 
           <div className="relative" ref={userMenuRef}>
             <button

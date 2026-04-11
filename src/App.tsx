@@ -11,6 +11,7 @@ import DTC from "./pages/Dtc";
 import VslBuilder from "./pages/VslBuilder.tsx";
 import PaginaAdvertorial from "./pages/PaginaAdvertorial";
 import Ferramentas from "@/pages/Ferramentas";
+import AdminNotifications from "@/pages/AdminNotifications";
 
 
 function LoadingScreen() {
@@ -86,6 +87,8 @@ function AppRoutes() {
 <Route path="/vsl-builder" element={<VslBuilder />} />
 
 <Route path="/pagina-advertorial" element={<PaginaAdvertorial />} />
+
+<Route path="/admin-notificacoes" element={<AdminNotifications />} />
 
 <Route
   path="/admin-users"
