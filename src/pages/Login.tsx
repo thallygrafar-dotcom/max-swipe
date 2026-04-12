@@ -124,7 +124,7 @@ export default function Login() {
   };
 
   return (
-    <div className="flex min-h-screen w-full bg-black text-white">
+    <div className="flex min-h-screen w-full flex-col overflow-x-hidden bg-black text-white lg:flex-row">
       <div className="relative hidden w-1/2 overflow-hidden lg:flex">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(220,38,38,0.28),transparent_28%),radial-gradient(circle_at_bottom_right,rgba(220,38,38,0.18),transparent_38%),linear-gradient(180deg,#050505_0%,#000000_100%)]" />
         <div className="absolute inset-0 opacity-[0.05] bg-[linear-gradient(to_right,#ffffff10_1px,transparent_1px),linear-gradient(to_bottom,#ffffff10_1px,transparent_1px)] bg-[size:40px_40px]" />
@@ -247,7 +247,7 @@ export default function Login() {
                   placeholder="seu@email.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="mt-2 h-[52px] w-full rounded-xl border border-zinc-300 bg-white px-4 text-sm text-black outline-none transition-all duration-200 placeholder:text-zinc-400 focus:border-red-500/50 focus:shadow-[0_0_0_4px_rgba(239,68,68,0.08)]"
+                  className="mt-2 h-[52px] w-full rounded-xl border border-zinc-300 bg-white px-4 text-base text-black outline-none transition-all duration-200 placeholder:text-zinc-400 focus:border-red-500/50 focus:shadow-[0_0_0_4px_rgba(239,68,68,0.08)]"
                 />
               </div>
 
@@ -258,7 +258,7 @@ export default function Login() {
                   placeholder="••••••••"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="mt-2 h-[52px] w-full rounded-xl border border-zinc-300 bg-white px-4 text-sm text-black outline-none transition-all duration-200 placeholder:text-zinc-400 focus:border-red-500/50 focus:shadow-[0_0_0_4px_rgba(239,68,68,0.08)]"
+                  className="mt-2 h-[52px] w-full rounded-xl border border-zinc-300 bg-white px-4 text-base text-black outline-none transition-all duration-200 placeholder:text-zinc-400 focus:border-red-500/50 focus:shadow-[0_0_0_4px_rgba(239,68,68,0.08)]"
                 />
               </div>
 
