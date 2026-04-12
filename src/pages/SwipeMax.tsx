@@ -4,9 +4,10 @@ import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/hooks/useAuth";
 import SwipeHeader from "@/components/SwipeHeader";
 import SwipeFooter from "@/components/SwipeFooter";
+import SwipeMaxPricingModal from "@/components/SwipeMaxPricingModal";
+import SwipeMaxInvisibleModal from "@/components/SwipeMaxInvisibleModal";
 import {
   Search,
-  BarChart3,
   ChevronDown,
   Link as LinkIcon,
   Sparkles,
@@ -17,12 +18,13 @@ import {
   Library,
   Wrench,
   ArrowRight,
+  Loader2,
+  CheckCircle2,
 } from "lucide-react";
 
 type OfferStatus = "Escalando" | "Teste" | "Validada";
 type OfferStyle = "Black" | "White";
 type OfferFormat = "Advertorial" | "VSL" | "Quiz" | "Bridge Page";
-type UserPlan = "monthly" | "annual";
 
 type DbOfferItem = {
   id: number;
@@ -61,6 +63,11 @@ type OfferItem = {
 };
 
 type UserPlanType = "monthly" | "annual";
+type DownloadKind = "vsl" | "transcription";
+type DownloadState = {
+  key: string | null;
+  status: "idle" | "loading" | "done";
+};
 
 const niches = [
   "Todos",
@@ -120,6 +127,60 @@ function getSafeTimestamp(dateString: string) {
   return Number.isNaN(timestamp) ? 0 : timestamp;
 }
 
+function normalizeGoogleDownloadUrl(url: string) {
+  if (!url) return "";
+
+  const driveFileMatch = url.match(/drive\.google\.com\/file\/d\/([^/]+)/i);
+  if (driveFileMatch?.[1]) {
+    return `https://drive.google.com/uc?export=download&id=${driveFileMatch[1]}`;
+  }
+
+  const docsMatch = url.match(/docs\.google\.com\/document\/d\/([^/]+)/i);
+  if (docsMatch?.[1]) {
+    return `https://docs.google.com/document/d/${docsMatch[1]}/export?format=pdf`;
+  }
+
+  return url;
+}
+
+function slugifyFileName(value: string) {
+  return value
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-zA-Z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .replace(/-+/g, "-");
+}
+
+async function forceDownload(url: string, filename: string) {
+  try {
+    const response = await fetch(url);
+    if (!response.ok) {
+      throw new Error(`Falha no download: ${response.status}`);
+    }
+
+    const blob = await response.blob();
+    const objectUrl = window.URL.createObjectURL(blob);
+
+    const link = document.createElement("a");
+    link.href = objectUrl;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+
+    window.URL.revokeObjectURL(objectUrl);
+  } catch {
+    const fallbackLink = document.createElement("a");
+    fallbackLink.href = url;
+    fallbackLink.target = "_blank";
+    fallbackLink.rel = "noreferrer";
+    document.body.appendChild(fallbackLink);
+    fallbackLink.click();
+    document.body.removeChild(fallbackLink);
+  }
+}
+
 export default function SwipeMax() {
   const navigate = useNavigate();
   const { signOut } = useAuth();
@@ -135,8 +196,12 @@ export default function SwipeMax() {
   const [selectedStyle, setSelectedStyle] = useState("Todos");
   const [selectedStatus, setSelectedStatus] = useState("Todos");
   const [sortBy, setSortBy] = useState("recent");
-
   const [showPricingModal, setShowPricingModal] = useState(false);
+  const [showInvisibleModal, setShowInvisibleModal] = useState(false);
+  const [downloadState, setDownloadState] = useState<DownloadState>({
+    key: null,
+    status: "idle",
+  });
 
   const isAnnual = userPlan === "annual";
   const loading = loadingOffers || loadingPlan;
@@ -223,8 +288,8 @@ export default function SwipeMax() {
         imageUrl:
           item.image_url ||
           "https://via.placeholder.com/1200x800?text=Swipe+MAX",
-        vslUrl: item.vsl_url ?? "",
-        transcriptionUrl: item.transcription_url ?? "",
+        vslUrl: normalizeGoogleDownloadUrl(item.vsl_url ?? ""),
+        transcriptionUrl: normalizeGoogleDownloadUrl(item.transcription_url ?? ""),
         invisibleStructureUrl: item.invisible_structure_url ?? "",
         adsCount: item.ads_count ?? 0,
         tags: item.tags ?? "",
@@ -325,22 +390,87 @@ export default function SwipeMax() {
     navigate(route);
   }
 
-  function handleInvisibleStructureClick(url: string) {
-    if (!isAnnual) {
-      openPricingModal();
-      return;
-    }
+  async function handleDownload(
+    offer: OfferItem,
+    kind: DownloadKind
+  ) {
+    const isVsl = kind === "vsl";
+    const url = isVsl ? offer.vslUrl : offer.transcriptionUrl;
 
-    if (!url) {
-      alert("Nenhum link de Estrutura Invisível foi cadastrado para esta VSL.");
-      return;
-    }
+    if (!url) return;
 
-    window.open(url, "_blank", "noopener,noreferrer");
+    const safeName = slugifyFileName(offer.title || "arquivo");
+    const filename = isVsl
+      ? `VSL-${safeName}.mp4`
+      : `TRANSCRICAO-${safeName}.pdf`;
+
+    const key = `${offer.id}-${kind}`;
+
+    setDownloadState({ key, status: "loading" });
+
+    await forceDownload(url, filename);
+
+    setDownloadState({ key, status: "done" });
+
+    window.setTimeout(() => {
+      setDownloadState((current) =>
+        current.key === key
+          ? { key: null, status: "idle" }
+          : current
+      );
+    }, 1800);
   }
 
   return (
     <>
+      <style>{`
+        html {
+          scrollbar-width: thin;
+          scrollbar-color: #ef4444 transparent;
+        }
+
+        html::-webkit-scrollbar {
+          width: 8px;
+        }
+
+        html::-webkit-scrollbar-track {
+          background: rgba(255, 255, 255, 0.03);
+        }
+
+        html::-webkit-scrollbar-thumb {
+          background: linear-gradient(180deg, #ef4444 0%, #991b1b 100%);
+          border-radius: 999px;
+          border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        html::-webkit-scrollbar-thumb:hover {
+          background: linear-gradient(180deg, #f87171 0%, #b91c1c 100%);
+        }
+
+        body {
+          scrollbar-width: thin;
+          scrollbar-color: #ef4444 transparent;
+        }
+
+        body::-webkit-scrollbar {
+          width: 8px;
+        }
+
+        body::-webkit-scrollbar-track {
+          background: rgba(255, 255, 255, 0.03);
+        }
+
+        body::-webkit-scrollbar-thumb {
+          background: linear-gradient(180deg, #ef4444 0%, #991b1b 100%);
+          border-radius: 999px;
+          border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        body::-webkit-scrollbar-thumb:hover {
+          background: linear-gradient(180deg, #f87171 0%, #b91c1c 100%);
+        }
+      `}</style>
+
       <div className="min-h-screen overflow-x-hidden bg-[#0c0c10] text-white">
         <div className="pointer-events-none fixed inset-0 bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.06),transparent_24%),radial-gradient(circle_at_top_right,rgba(239,68,68,0.10),transparent_20%),radial-gradient(circle_at_bottom_left,rgba(59,130,246,0.06),transparent_22%)]" />
         <div className="pointer-events-none fixed inset-x-0 top-0 h-[380px] bg-[linear-gradient(180deg,rgba(255,255,255,0.03)_0%,rgba(255,255,255,0)_100%)]" />
@@ -484,156 +614,171 @@ export default function SwipeMax() {
                 </div>
               ) : (
                 <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-4">
-                  {filteredOffers.map((offer) => (
-                    <article
-                      key={offer.id}
-                      className="group relative overflow-hidden rounded-[30px] border border-white/10 bg-[linear-gradient(180deg,rgba(22,22,28,0.96)_0%,rgba(13,13,18,0.98)_100%)] shadow-[0_16px_34px_rgba(0,0,0,0.18)] transition-all duration-300 hover:-translate-y-1.5 hover:border-red-500/25 hover:shadow-[0_24px_54px_rgba(0,0,0,0.24)]"
-                    >
-                      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.05),transparent_30%),radial-gradient(circle_at_bottom_right,rgba(239,68,68,0.06),transparent_22%)] opacity-80" />
-                      <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/12 to-transparent opacity-70 transition-opacity duration-300 group-hover:via-red-400/35" />
+                  {filteredOffers.map((offer) => {
+                    const vslKey = `${offer.id}-vsl`;
+                    const transcriptionKey = `${offer.id}-transcription`;
+                    const isDownloadingVsl =
+                      downloadState.key === vslKey &&
+                      downloadState.status === "loading";
+                    const isDownloadedVsl =
+                      downloadState.key === vslKey &&
+                      downloadState.status === "done";
 
-                      <div className="relative z-10">
-                        <div className="relative h-[238px] overflow-hidden">
-                          <img
-                            src={offer.imageUrl}
-                            alt={offer.title}
-                            className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.05]"
-                          />
+                    const isDownloadingTranscription =
+                      downloadState.key === transcriptionKey &&
+                      downloadState.status === "loading";
+                    const isDownloadedTranscription =
+                      downloadState.key === transcriptionKey &&
+                      downloadState.status === "done";
 
-                          <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(0,0,0,0.03)_0%,rgba(0,0,0,0.14)_48%,rgba(0,0,0,0.74)_100%)]" />
+                    return (
+                      <article
+                        key={offer.id}
+                        className="group relative overflow-hidden rounded-[30px] border border-white/10 bg-[linear-gradient(180deg,rgba(22,22,28,0.96)_0%,rgba(13,13,18,0.98)_100%)] shadow-[0_16px_34px_rgba(0,0,0,0.18)] transition-all duration-300 hover:-translate-y-1.5 hover:border-red-500/25 hover:shadow-[0_24px_54px_rgba(0,0,0,0.24)]"
+                      >
+                        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.05),transparent_30%),radial-gradient(circle_at_bottom_right,rgba(239,68,68,0.06),transparent_22%)] opacity-80" />
+                        <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/12 to-transparent opacity-70 transition-opacity duration-300 group-hover:via-red-400/35" />
 
-                          <div className="absolute left-4 top-4 flex items-center gap-2">
-                            <div
-                              className={`inline-flex shrink-0 items-center gap-2 rounded-full border px-3 py-1 text-[11px] font-semibold backdrop-blur-md ${getStatusStyles(
-                                offer.status
-                              )}`}
-                            >
-                              <span className="h-2 w-2 rounded-full bg-current opacity-80" />
-                              {offer.status}
+                        <div className="relative z-10">
+                          <div className="relative h-[238px] overflow-hidden">
+                            <img
+                              src={offer.imageUrl}
+                              alt={offer.title}
+                              className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.05]"
+                            />
+
+                            <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(0,0,0,0.03)_0%,rgba(0,0,0,0.14)_48%,rgba(0,0,0,0.74)_100%)]" />
+
+                            <div className="absolute left-4 top-4 flex items-center gap-2">
+                              <div
+                                className={`inline-flex shrink-0 items-center gap-2 rounded-full border px-3 py-1 text-[11px] font-semibold backdrop-blur-md ${getStatusStyles(
+                                  offer.status
+                                )}`}
+                              >
+                                <span className="h-2 w-2 rounded-full bg-current opacity-80" />
+                                {offer.status}
+                              </div>
                             </div>
-                          </div>
 
-                          <div className="absolute bottom-0 left-0 right-0 p-4">
-                            <div className="flex items-center justify-between gap-3">
-                              <p className="text-[13px] text-zinc-300">
+                            <div className="absolute right-4 top-4">
+                              <div className="inline-flex items-center rounded-full border border-white/10 bg-black/30 px-3 py-1.5 text-[12px] font-medium text-zinc-100 backdrop-blur-md">
                                 {offer.createdAt
                                   ? formatDisplayDate(offer.createdAt)
                                   : ""}
-                              </p>
-
-                              <div className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-black/24 px-3 py-1.5 text-[13px] font-medium text-zinc-100 backdrop-blur-md">
-                                <BarChart3 className="h-4 w-4 text-red-300" />
-                                {offer.adsCount} ads
                               </div>
                             </div>
                           </div>
+
+                          <div className="p-5">
+                            <div className="min-h-[90px]">
+                              <h3 className="line-clamp-3 text-[20px] font-semibold leading-[1.08] tracking-[-0.03em] text-white transition-colors duration-300 group-hover:text-red-50">
+                                {offer.title}
+                              </h3>
+
+                              {offer.niche ? (
+                                <p className="mt-2 line-clamp-1 text-[13px] text-zinc-400">
+                                  Nicho:{" "}
+                                  <span className="text-zinc-200">
+                                    {offer.niche}
+                                  </span>
+                                </p>
+                              ) : null}
+
+                              {offer.product ? (
+                                <p className="mt-1 line-clamp-1 text-[13px] text-zinc-400">
+                                  Produto:{" "}
+                                  <span className="text-zinc-200">
+                                    {offer.product}
+                                  </span>
+                                </p>
+                              ) : null}
+                            </div>
+
+                            <div className="mt-4 flex flex-wrap gap-2">
+                              <Tag className={getStyleTagStyles(offer.style)}>
+                                {offer.style}
+                              </Tag>
+                              <Tag>{offer.format}</Tag>
+
+                              {offer.tags
+                                .split(",")
+                                .map((tag) => tag.trim())
+                                .filter(Boolean)
+                                .map((tag) => (
+                                  <Tag key={tag}>{tag}</Tag>
+                                ))}
+                            </div>
+
+                            <div className="mt-5 grid grid-cols-2 gap-2">
+                              <button
+                                type="button"
+                                onClick={() => handleDownload(offer, "vsl")}
+                                disabled={!offer.vslUrl || isDownloadingVsl}
+                                className={`inline-flex h-[46px] items-center justify-center gap-2 rounded-2xl border border-red-500/30 bg-red-500/10 px-4 text-[13px] font-semibold text-white transition-all duration-300 hover:border-red-500/50 hover:bg-red-500/16 hover:shadow-[0_10px_24px_rgba(127,29,29,0.18)] ${
+                                  !offer.vslUrl
+                                    ? "cursor-not-allowed opacity-40"
+                                    : ""
+                                }`}
+                              >
+                                {isDownloadingVsl ? (
+                                  <Loader2 className="h-4 w-4 animate-spin" />
+                                ) : isDownloadedVsl ? (
+                                  <CheckCircle2 className="h-4 w-4" />
+                                ) : (
+                                  <LinkIcon className="h-4 w-4" />
+                                )}
+                                {isDownloadingVsl
+                                  ? "Baixando..."
+                                  : isDownloadedVsl
+                                  ? "Baixado"
+                                  : "Baixar VSL"}
+                              </button>
+
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  handleDownload(offer, "transcription")
+                                }
+                                disabled={
+                                  !offer.transcriptionUrl ||
+                                  isDownloadingTranscription
+                                }
+                                className={`inline-flex h-[46px] items-center justify-center gap-2 rounded-2xl border border-amber-400/30 bg-amber-400/10 px-4 text-[13px] font-semibold text-amber-100 transition-all duration-300 hover:border-amber-400/50 hover:bg-amber-400/16 hover:shadow-[0_10px_24px_rgba(245,158,11,0.16)] ${
+                                  !offer.transcriptionUrl
+                                    ? "cursor-not-allowed opacity-40"
+                                    : ""
+                                }`}
+                              >
+                                {isDownloadingTranscription ? (
+                                  <Loader2 className="h-4 w-4 animate-spin" />
+                                ) : isDownloadedTranscription ? (
+                                  <CheckCircle2 className="h-4 w-4" />
+                                ) : (
+                                  <LinkIcon className="h-4 w-4" />
+                                )}
+                                {isDownloadingTranscription
+                                  ? "Baixando..."
+                                  : isDownloadedTranscription
+                                  ? "Baixado"
+                                  : "Baixar Transcrição"}
+                              </button>
+                            </div>
+
+                            <div className="mt-3">
+                              <button
+                                type="button"
+                                onClick={() => setShowInvisibleModal(true)}
+                                className="inline-flex h-[44px] w-full items-center justify-center gap-2 rounded-2xl border border-white/10 bg-white/[0.03] px-4 text-[12px] font-semibold text-zinc-300 transition-all duration-300 hover:border-white/15 hover:bg-white/[0.05]"
+                              >
+                                <Sparkles className="h-4 w-4" />
+                                Estrutura Invisível - Em Breve
+                              </button>
+                            </div>
+                          </div>
                         </div>
-
-                        <div className="p-5">
-                          <div className="min-h-[90px]">
-                            <h3 className="line-clamp-3 text-[20px] font-semibold leading-[1.08] tracking-[-0.03em] text-white transition-colors duration-300 group-hover:text-red-50">
-                              {offer.title}
-                            </h3>
-
-                            {offer.niche ? (
-                              <p className="mt-2 line-clamp-1 text-[13px] text-zinc-400">
-                                Nicho:{" "}
-                                <span className="text-zinc-200">{offer.niche}</span>
-                              </p>
-                            ) : null}
-
-                            {offer.product ? (
-                              <p className="mt-1 line-clamp-1 text-[13px] text-zinc-400">
-                                Produto:{" "}
-                                <span className="text-zinc-200">
-                                  {offer.product}
-                                </span>
-                              </p>
-                            ) : null}
-                          </div>
-
-                          <div className="mt-4 flex flex-wrap gap-2">
-                            <Tag className={getStyleTagStyles(offer.style)}>
-                              {offer.style}
-                            </Tag>
-                            <Tag>{offer.format}</Tag>
-
-                            {offer.tags
-                              .split(",")
-                              .map((tag) => tag.trim())
-                              .filter(Boolean)
-                              .map((tag) => (
-                                <Tag key={tag}>{tag}</Tag>
-                              ))}
-                          </div>
-
-                          <div className="mt-5 grid grid-cols-2 gap-2">
-                            <a
-                              href={offer.vslUrl || "#"}
-                              target="_blank"
-                              rel="noreferrer"
-                              onClick={(e) => {
-                                if (!offer.vslUrl) e.preventDefault();
-                              }}
-                              className={`inline-flex h-[46px] items-center justify-center gap-2 rounded-2xl border border-red-500/30 bg-red-500/10 px-4 text-[13px] font-semibold text-white transition-all duration-300 hover:border-red-500/50 hover:bg-red-500/16 hover:shadow-[0_10px_24px_rgba(127,29,29,0.18)] ${
-                                !offer.vslUrl
-                                  ? "cursor-not-allowed opacity-40"
-                                  : ""
-                              }`}
-                            >
-                              <LinkIcon className="h-4 w-4" />
-                              Abrir VSL
-                            </a>
-
-                            <a
-                              href={offer.transcriptionUrl || "#"}
-                              target="_blank"
-                              rel="noreferrer"
-                              onClick={(e) => {
-                                if (!offer.transcriptionUrl) e.preventDefault();
-                              }}
-                              className={`inline-flex h-[46px] items-center justify-center gap-2 rounded-2xl border border-white/10 bg-white/[0.05] px-4 text-[13px] font-semibold text-white transition-all duration-300 hover:border-red-500/25 hover:bg-white/[0.08] ${
-                                !offer.transcriptionUrl
-                                  ? "cursor-not-allowed opacity-40"
-                                  : ""
-                              }`}
-                            >
-                              <LinkIcon className="h-4 w-4" />
-                              Transcrição
-                            </a>
-                          </div>
-
-                          <div className="mt-3">
-                            <button
-                              type="button"
-                              onClick={() =>
-                                handleInvisibleStructureClick(
-                                  offer.invisibleStructureUrl
-                                )
-                              }
-                              className={`inline-flex h-[44px] w-full items-center justify-center gap-2 rounded-2xl border px-4 text-[12px] font-semibold transition-all duration-300 ${
-                                isAnnual
-                                  ? "border-emerald-400/20 bg-emerald-400/[0.08] text-emerald-100 hover:border-emerald-400/35 hover:bg-emerald-400/[0.12]"
-                                  : "border-white/10 bg-white/[0.03] text-zinc-300 hover:border-white/15 hover:bg-white/[0.05]"
-                              }`}
-                            >
-                              {isAnnual ? (
-                                <>
-                                  <Check className="h-4 w-4" />
-                                  Estrutura Invisível
-                                </>
-                              ) : (
-                                <>
-                                  <Lock className="h-4 w-4" />
-                                  Estrutura Invisível
-                                </>
-                              )}
-                            </button>
-                          </div>
-                        </div>
-                      </div>
-                    </article>
-                  ))}
+                      </article>
+                    );
+                  })}
                 </div>
               )}
             </section>
@@ -643,12 +788,15 @@ export default function SwipeMax() {
 
       <SwipeFooter />
 
-      {showPricingModal ? (
-        <PricingModal
-          onClose={closePricingModal}
-          onAnnualClick={() => navigate("/pricing")}
+      {showPricingModal && (
+        <SwipeMaxPricingModal onClose={closePricingModal} />
+      )}
+
+      {showInvisibleModal && (
+        <SwipeMaxInvisibleModal
+          onClose={() => setShowInvisibleModal(false)}
         />
-      ) : null}
+      )}
     </>
   );
 }
@@ -705,92 +853,6 @@ function DashboardHeroCard({
         </div>
       </div>
     </button>
-  );
-}
-
-function PricingModal({
-  onClose,
-  onAnnualClick,
-}: {
-  onClose: () => void;
-  onAnnualClick: () => void;
-}) {
-  return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/70 px-4 backdrop-blur-sm">
-      <div className="relative w-full max-w-[520px] overflow-hidden rounded-[28px] border border-white/10 bg-[linear-gradient(180deg,rgba(22,22,28,0.98)_0%,rgba(13,13,18,1)_100%)] p-6 shadow-[0_30px_100px_rgba(0,0,0,0.45)]">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(239,68,68,0.12),transparent_22%),radial-gradient(circle_at_bottom_left,rgba(255,255,255,0.05),transparent_28%)]" />
-
-        <button
-          type="button"
-          onClick={onClose}
-          className="absolute right-4 top-4 z-10 inline-flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-white/[0.05] text-zinc-300 transition-all hover:border-white/20 hover:bg-white/[0.08] hover:text-white"
-        >
-          <X className="h-4 w-4" />
-        </button>
-
-        <div className="relative z-10">
-          <div className="inline-flex items-center gap-2 rounded-full border border-amber-400/20 bg-amber-400/10 px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.16em] text-amber-200">
-            <Crown className="h-3.5 w-3.5" />
-            Recurso Premium
-          </div>
-
-          <h3 className="mt-4 text-[30px] font-semibold leading-[1.02] tracking-[-0.05em] text-white">
-            Libere o plano anual
-          </h3>
-
-          <p className="mt-3 text-[15px] leading-7 text-zinc-400">
-            Tenha acesso à página de Ferramentas Premium, com Advertorial,
-            DTC Builder, VSL Builder e à Estrutura Invisível de cada VSL.
-          </p>
-
-          <div className="mt-6 rounded-[24px] border border-red-500/20 bg-red-500/[0.07] p-5">
-            <div className="flex items-end gap-2">
-              <span className="text-[14px] text-zinc-400">12x de</span>
-              <span className="text-[38px] font-semibold leading-none tracking-[-0.05em] text-white">
-                R$154,82
-              </span>
-            </div>
-            <p className="mt-2 text-sm text-zinc-300">
-              Acesso anual ao SwipeMAX + Ferramentas Premium.
-            </p>
-          </div>
-
-          <div className="mt-5 space-y-3 text-sm text-zinc-300">
-            <div className="flex items-center gap-3">
-              <Check className="h-4 w-4 text-emerald-300" />
-              Página de Ferramentas Premium
-            </div>
-            <div className="flex items-center gap-3">
-              <Check className="h-4 w-4 text-emerald-300" />
-              DTC Builder liberado
-            </div>
-            <div className="flex items-center gap-3">
-              <Check className="h-4 w-4 text-emerald-300" />
-              VSL Builder liberado
-            </div>
-            <div className="flex items-center gap-3">
-              <Check className="h-4 w-4 text-emerald-300" />
-              Estrutura Invisível nas VSLs
-            </div>
-          </div>
-
-          <button
-            type="button"
-            onClick={() =>
-              window.open(
-                "https://pay.kiwify.com.br/re3AP8o",
-                "_blank",
-                "noopener,noreferrer"
-              )
-            }
-            className="mt-6 inline-flex h-[52px] w-full items-center justify-center gap-2 rounded-2xl border border-red-500/30 bg-red-500/10 px-4 text-[14px] font-semibold text-white transition-all duration-300 hover:border-red-500/50 hover:bg-red-500/16"
-          >
-            <Crown className="h-4 w-4" />
-            Quero o plano anual
-          </button>
-        </div>
-      </div>
-    </div>
   );
 }
 
