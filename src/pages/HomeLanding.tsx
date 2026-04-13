@@ -134,6 +134,7 @@ const monthlyItems = [
   { label: "Transcrições completas", included: true },
   { label: "Estrutura Invisível da VSL", included: false },
   { label: "Ferramentas Premium", included: false },
+  { label: "RadarPage", included: false },
   { label: "Ofertas CPA de Elite ($180+)", included: false },
   { label: "Suporte VIP", included: false },
 ];
@@ -144,6 +145,7 @@ const annualItems = [
   { label: "Transcrições completas", included: true },
   { label: "Estrutura Invisível da VSL", included: true },
   { label: "Ferramentas Premium", included: true },
+  { label: "RadarPage", included: true },
   { label: "Ofertas CPA de Elite ($180+)", included: true },
   { label: "Suporte VIP", included: true },
 ];
@@ -602,8 +604,8 @@ export default function HomeLanding() {
             />
             <BonusCard
               icon={<Sparkles className="h-5 w-5" />}
-              title="Estrutura Invisível"
-              desc="Leitura estratégica da engenharia por trás das VSLs vencedoras."
+              title="RadarPage"
+              desc="Páginas reais que estão rodando para inspiração de estrutura e copy"
             />
           </div>
         </div>
