@@ -491,11 +491,11 @@ export default function SwipeMax() {
 
         <div className="relative z-10 mx-auto w-full max-w-[1440px] px-4 pb-5 pt-24 md:px-6 md:pb-6 md:pt-28">
           <div className="flex flex-col gap-6">
-            <section className="grid grid-cols-1 gap-4 xl:grid-cols-2">
+            <section className="grid grid-cols-1 gap-4 xl:grid-cols-3">
               <DashboardHeroCard
                 eyebrow="SwipeMAX"
                 title="Biblioteca de VSLs e Transcrições"
-                description="VSLs reais que estão fazendo dinheiro todos os dias, prontas pra você estudar, analisar e replicar."
+                description="Cada VSL vem com transcrição completa e análise da estrutura de copy, revelando exatamente como cada parte é construída para gerar conversão."
                 icon={<Library className="h-5 w-5" />}
                 badge={
                   <div className="inline-flex items-center gap-2 rounded-full border border-emerald-400/20 bg-emerald-400/[0.10] px-3 py-1 text-[11px] font-semibold text-emerald-200">
@@ -511,11 +511,31 @@ export default function SwipeMax() {
                   })
                 }
               />
-
               <DashboardHeroCard
-                eyebrow="Premium"
-                title="Ferramentas Premium"
-                description="Acesse em uma página separada o Advertorial, DTC Builder e VSL Builder. Recurso exclusivo do plano anual."
+  eyebrow="RadarPage"
+  title="Páginas reais rodando no Google Ads"
+  description="Veja páginas que estão no ar agora sendo anunciadas, com estrutura, copy e construção prontas para análise e inspiração."
+  icon={<Sparkles className="h-5 w-5" />}
+  badge={
+    isAnnual ? (
+      <div className="inline-flex items-center gap-2 rounded-full border border-emerald-400/20 bg-emerald-400/[0.10] px-3 py-1 text-[11px] font-semibold text-emerald-200">
+        <Crown className="h-3.5 w-3.5" />
+        Liberado
+      </div>
+    ) : (
+      <div className="inline-flex items-center gap-2 rounded-full border border-amber-400/20 bg-amber-400/[0.10] px-3 py-1 text-[11px] font-semibold text-amber-200">
+        <Lock className="h-3.5 w-3.5" />
+        Plano anual
+      </div>
+    )
+  }
+  buttonLabel={isAnnual ? "Explorar RadarPage" : "Em Breve"}
+  onClick={() => openSoonModal("RadarPage")}
+/>
+              <DashboardHeroCard
+                eyebrow="Builders"
+                title="Builders e Ferramentas Premium"
+                description="Construa páginas com estrutura validada usando Advertorial, DTC e VSL Builder. Tudo pronto para executar com mais velocidade e menos erro."
                 icon={<Wrench className="h-5 w-5" />}
                 badge={
                   isAnnual ? (
@@ -530,7 +550,7 @@ export default function SwipeMax() {
                     </div>
                   )
                 }
-                buttonLabel={isAnnual ? "Acessar ferramentas" : "Ver planos"}
+                buttonLabel={isAnnual ? "Acessar ferramentas" : "Em Breve"}
                                 onClick={() => openSoonModal("Ferramentas Premium")}
               />
             </section>
@@ -886,12 +906,14 @@ function DashboardHeroCard({
   buttonLabel: string;
   onClick: () => void;
 }) {
+
+  const isRadar = eyebrow === "RadarPage";
+  
   return (
     <button
       type="button"
       onClick={onClick}
-      className="group relative overflow-hidden rounded-[32px] border border-white/10 bg-[linear-gradient(180deg,rgba(22,22,28,0.92)_0%,rgba(14,14,18,0.94)_100%)] p-5 text-left shadow-[0_24px_80px_rgba(0,0,0,0.28)] transition-all duration-300 hover:-translate-y-1 hover:border-red-500/20 md:p-7"
-    >
+className={`group relative overflow-hidden rounded-[32px] border ${isRadar ? "border-red-500/40 shadow-[0_0_0_1px_rgba(239,68,68,0.25),0_25px_80px_rgba(239,68,68,0.15)]" : "border-white/10"} bg-[linear-gradient(180deg,rgba(22,22,28,0.92)_0%,rgba(14,14,18,0.94)_100%)] p-5 text-left shadow-[0_24px_80px_rgba(0,0,0,0.28)] transition-all duration-300 hover:-translate-y-1 hover:border-red-500/20 md:p-7`}    >
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.06),transparent_26%),radial-gradient(circle_at_bottom_right,rgba(239,68,68,0.08),transparent_20%)]" />
       <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent" />
 
