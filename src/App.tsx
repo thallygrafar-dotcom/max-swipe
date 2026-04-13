@@ -12,7 +12,7 @@ import VslBuilder from "./pages/VslBuilder.tsx";
 import PaginaAdvertorial from "./pages/PaginaAdvertorial";
 import Ferramentas from "@/pages/Ferramentas";
 import AdminNotifications from "@/pages/AdminNotifications";
-
+import HomeLanding from "./pages/HomeLanding";
 
 function LoadingScreen() {
   return (
@@ -53,7 +53,7 @@ function PublicRoute({ children }: { children: ReactNode }) {
 function AppRoutes() {
   return (
     <Routes>
-      <Route path="/" element={<Navigate to="/login" replace />} />
+      <Route path="/" element={<HomeLanding />} />
 
       <Route
         path="/login"
@@ -74,41 +74,41 @@ function AppRoutes() {
       />
 
       <Route
-  path="/signup"
-  element={
-    <PublicRoute>
-      <Signup />
-    </PublicRoute>
-  }
-/>
+        path="/signup"
+        element={
+          <PublicRoute>
+            <Signup />
+          </PublicRoute>
+        }
+      />
 
-<Route path="/ferramentas" element={<Ferramentas />} />
+      <Route path="/ferramentas" element={<Ferramentas />} />
 
-<Route path="/vsl-builder" element={<VslBuilder />} />
+      <Route path="/vsl-builder" element={<VslBuilder />} />
 
-<Route path="/pagina-advertorial" element={<PaginaAdvertorial />} />
+      <Route path="/pagina-advertorial" element={<PaginaAdvertorial />} />
 
-<Route path="/admin-notificacoes" element={<AdminNotifications />} />
+      <Route path="/admin-notificacoes" element={<AdminNotifications />} />
 
-<Route
-  path="/admin-users"
-  element={
-    <ProtectedRoute>
-      <AdminUsers />
-    </ProtectedRoute>
-  }
-/>
+      <Route
+        path="/admin-users"
+        element={
+          <ProtectedRoute>
+            <AdminUsers />
+          </ProtectedRoute>
+        }
+      />
 
-<Route path="/reset-password" element={<ResetPassword />} />
+      <Route path="/reset-password" element={<ResetPassword />} />
 
-<Route
-  path="/dtc"
-  element={
-    <ProtectedRoute>
-      <DTC />
-    </ProtectedRoute>
-  }
-/>
+      <Route
+        path="/dtc"
+        element={
+          <ProtectedRoute>
+            <DTC />
+          </ProtectedRoute>
+        }
+      />
 
       <Route
         path="/swipe-max-admin"
@@ -119,7 +119,7 @@ function AppRoutes() {
         }
       />
 
-      <Route path="*" element={<Navigate to="/login" replace />} />
+      <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
 }
