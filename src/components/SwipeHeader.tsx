@@ -10,6 +10,7 @@ import {
   Wand2,
   LayoutTemplate,
   Lock,
+  X,
 } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import ProfileModal from '@/components/ProfileModal';
@@ -50,6 +51,9 @@ const GlobalHeader = ({
   const authEmail = user?.email ?? '';
   const trimmedEmail = authEmail.trim();
   const loweredEmail = trimmedEmail.toLowerCase();
+
+  const [soonModalOpen, setSoonModalOpen] = useState(false);
+  const [soonModalTitle, setSoonModalTitle] = useState("Ferramenta");
 
   const displayName =
     user?.user_metadata?.full_name ||
@@ -213,17 +217,25 @@ const GlobalHeader = ({
       if (event.key === 'Escape') {
         setUserMenuOpen(false);
         setHamburgerMenuOpen(false);
+        setSoonModalOpen(false);
       }
     };
+
+    const previousOverflow = document.body.style.overflow;
+
+    if (soonModalOpen) {
+      document.body.style.overflow = 'hidden';
+    }
 
     document.addEventListener('mousedown', handleClickOutside);
     document.addEventListener('keydown', handleEscape);
 
     return () => {
+      document.body.style.overflow = previousOverflow;
       document.removeEventListener('mousedown', handleClickOutside);
       document.removeEventListener('keydown', handleEscape);
     };
-  }, []);
+  }, [soonModalOpen]);
 
   const handleProfileClick = () => {
     setProfileModalOpen(true);
@@ -236,261 +248,325 @@ const GlobalHeader = ({
     setHamburgerMenuOpen(false);
   };
 
+  const handleOpenSoonModal = (title: string) => {
+    setSoonModalTitle(title);
+    setSoonModalOpen(true);
+    setHamburgerMenuOpen(false);
+  };
+
   return (
-    <header className="sticky top-0 z-50 h-[78px] border-b border-white/10 bg-[#050816]">
-      <div className="relative mx-auto flex h-full max-w-[1440px] items-center justify-between px-4 sm:px-6">
-        <div className="flex items-center gap-3">
-          <div className="relative" ref={hamburgerMenuRef}>
-            {showSidebarToggle && (
-              <button
-                type="button"
-                onClick={() => {
-                  setHamburgerMenuOpen((prev) => !prev);
-                  onToggleSidebar?.();
-                }}
-                className="group flex h-11 w-11 items-center justify-center rounded-[20px] border border-white/10 bg-[#0B1020] text-zinc-300 shadow-[0_8px_30px_rgba(0,0,0,0.35)] transition-all duration-200 hover:border-white/15 hover:bg-[#11182C] hover:text-white"
-              >
-                <Menu
-                  size={20}
-                  className="transition-transform duration-200 group-hover:scale-110"
-                />
-              </button>
-            )}
+    <>
+      <header className="sticky top-0 z-50 h-[78px] border-b border-white/10 bg-[#050816]">
+        <div className="relative mx-auto flex h-full max-w-[1440px] items-center justify-between px-4 sm:px-6">
+          <div className="flex items-center gap-3">
+            <div className="relative" ref={hamburgerMenuRef}>
+              {showSidebarToggle && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setHamburgerMenuOpen((prev) => !prev);
+                    onToggleSidebar?.();
+                  }}
+                  className="group flex h-11 w-11 items-center justify-center rounded-[20px] border border-white/10 bg-[#0B1020] text-zinc-300 shadow-[0_8px_30px_rgba(0,0,0,0.35)] transition-all duration-200 hover:border-white/15 hover:bg-[#11182C] hover:text-white"
+                >
+                  <Menu
+                    size={20}
+                    className="transition-transform duration-200 group-hover:scale-110"
+                  />
+                </button>
+              )}
 
-            {hamburgerMenuOpen && (
-              <div className="absolute left-0 top-[calc(100%+12px)] z-[80] w-[340px] overflow-hidden rounded-[28px] border border-white/10 bg-[rgba(7,10,22,0.97)] shadow-[0_30px_90px_rgba(0,0,0,0.60)] backdrop-blur-[34px]">
-                <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(255,70,70,0.09),transparent_30%),radial-gradient(circle_at_bottom_right,rgba(59,130,246,0.12),transparent_35%)]" />
+              {hamburgerMenuOpen && (
+                <div className="absolute left-0 top-[calc(100%+12px)] z-[80] w-[340px] overflow-hidden rounded-[28px] border border-white/10 bg-[rgba(7,10,22,0.97)] shadow-[0_30px_90px_rgba(0,0,0,0.60)] backdrop-blur-[34px]">
+                  <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(255,70,70,0.09),transparent_30%),radial-gradient(circle_at_bottom_right,rgba(59,130,246,0.12),transparent_35%)]" />
 
-                <div className="relative border-b border-white/10 px-5 py-4">
-                  <div className="mb-1 flex items-center gap-2">
-                    <Sparkles size={15} className="text-[#ff4b4b]" />
-                    <p className="text-[15px] font-semibold text-white">
-                      Ferramentas Premium
+                  <div className="relative border-b border-white/10 px-5 py-4">
+                    <div className="mb-1 flex items-center gap-2">
+                      <Sparkles size={15} className="text-[#ff4b4b]" />
+                      <p className="text-[15px] font-semibold text-white">
+                        Ferramentas Premium
+                      </p>
+                    </div>
+
+                    <p className="text-sm leading-6 text-zinc-400">
+                      Acesse páginas e builders prontos para editar.
                     </p>
                   </div>
 
-                  <p className="text-sm leading-6 text-zinc-400">
-                    Acesse páginas e builders prontos para editar.
-                  </p>
-                </div>
-
-                <div className="relative p-2">
-                  <button
-                    type="button"
-                    onClick={handleToolsHubClick}
-                    className="group flex w-full items-center justify-between rounded-[22px] px-3 py-3 text-left transition-all duration-200 hover:bg-white/[0.05]"
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className="flex h-11 w-11 items-center justify-center rounded-[16px] border border-white/10 bg-white/[0.04] text-zinc-100">
-                        <FileText size={18} />
-                      </div>
-                      <div>
-                        <p className="text-sm font-medium text-white">
-                          Página Advertorial
-                        </p>
-                        <p className="text-xs text-zinc-500">
-                          Hub de ferramentas premium
-                        </p>
-                      </div>
-                    </div>
-
-                    {!loadingPlan && !isAnnual ? (
-                      <Lock size={16} className="text-zinc-500" />
-                    ) : null}
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={handleToolsHubClick}
-                    className="group flex w-full items-center justify-between rounded-[22px] px-3 py-3 text-left transition-all duration-200 hover:bg-white/[0.05]"
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className="flex h-11 w-11 items-center justify-center rounded-[16px] border border-white/10 bg-white/[0.04] text-zinc-100">
-                        <Wand2 size={18} />
-                      </div>
-                      <div>
-                        <p className="text-sm font-medium text-white">
-                          VSL Builder
-                        </p>
-                        <p className="text-xs text-zinc-500">
-                          Hub de ferramentas premium
-                        </p>
-                      </div>
-                    </div>
-
-                    {!loadingPlan && !isAnnual ? (
-                      <Lock size={16} className="text-zinc-500" />
-                    ) : null}
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={handleToolsHubClick}
-                    className="group flex w-full items-center justify-between rounded-[22px] px-3 py-3 text-left transition-all duration-200 hover:bg-white/[0.05]"
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className="flex h-11 w-11 items-center justify-center rounded-[16px] border border-white/10 bg-white/[0.04] text-zinc-100">
-                        <LayoutTemplate size={18} />
-                      </div>
-                      <div>
-                        <p className="text-sm font-medium text-white">
-                          DTC Builder
-                        </p>
-                        <p className="text-xs text-zinc-500">
-                          Hub de ferramentas premium
-                        </p>
-                      </div>
-                    </div>
-
-                    {!loadingPlan && !isAnnual ? (
-                      <Lock size={16} className="text-zinc-500" />
-                    ) : null}
-                  </button>
-
-                  <div className="mt-2 px-3 pb-2 pt-1">
+                  <div className="relative p-2">
                     <button
                       type="button"
-                      onClick={handleToolsHubClick}
-                      className={`inline-flex h-11 w-full items-center justify-center gap-2 rounded-[18px] border text-sm font-semibold transition-all duration-200 ${
-                        isAnnual
-                          ? "border-red-500/30 bg-red-500/10 text-white hover:border-red-500/50 hover:bg-red-500/16"
-                          : "border-white/10 bg-white/[0.04] text-zinc-300 hover:border-white/15 hover:bg-white/[0.06]"
-                      }`}
+                      onClick={() => handleOpenSoonModal("Página Advertorial")}
+                      className="group flex w-full items-center justify-between rounded-[22px] px-3 py-3 text-left transition-all duration-200 hover:bg-white/[0.05]"
                     >
-                      {isAnnual ? (
-                        <>
-                          <Sparkles size={16} />
-                          Acessar ferramentas
-                        </>
-                      ) : (
-                        <>
-                          <Lock size={16} />
-                          Ver ferramentas
-                        </>
-                      )}
+                      <div className="flex items-center gap-3">
+                        <div className="flex h-11 w-11 items-center justify-center rounded-[16px] border border-white/10 bg-white/[0.04] text-zinc-100">
+                          <FileText size={18} />
+                        </div>
+                        <div>
+                          <p className="text-sm font-medium text-white">
+                            Página Advertorial
+                          </p>
+                          <p className="text-xs text-zinc-500">
+                            Em Breve
+                          </p>
+                        </div>
+                      </div>
+
+                      {!loadingPlan && !isAnnual ? (
+                        <Lock size={16} className="text-zinc-500" />
+                      ) : null}
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => handleOpenSoonModal("VSL Builder")}
+                      className="group flex w-full items-center justify-between rounded-[22px] px-3 py-3 text-left transition-all duration-200 hover:bg-white/[0.05]"
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="flex h-11 w-11 items-center justify-center rounded-[16px] border border-white/10 bg-white/[0.04] text-zinc-100">
+                          <Wand2 size={18} />
+                        </div>
+                        <div>
+                          <p className="text-sm font-medium text-white">
+                            VSL Builder
+                          </p>
+                          <p className="text-xs text-zinc-500">
+                            Em Breve
+                          </p>
+                        </div>
+                      </div>
+
+                      {!loadingPlan && !isAnnual ? (
+                        <Lock size={16} className="text-zinc-500" />
+                      ) : null}
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => handleOpenSoonModal("DTC Builder")}
+                      className="group flex w-full items-center justify-between rounded-[22px] px-3 py-3 text-left transition-all duration-200 hover:bg-white/[0.05]"
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="flex h-11 w-11 items-center justify-center rounded-[16px] border border-white/10 bg-white/[0.04] text-zinc-100">
+                          <LayoutTemplate size={18} />
+                        </div>
+                        <div>
+                          <p className="text-sm font-medium text-white">
+                            DTC Builder
+                          </p>
+                          <p className="text-xs text-zinc-500">
+                            Em Breve
+                          </p>
+                        </div>
+                      </div>
+
+                      {!loadingPlan && !isAnnual ? (
+                        <Lock size={16} className="text-zinc-500" />
+                      ) : null}
+                    </button>
+
+                    <div className="mt-2 px-3 pb-2 pt-1">
+                      <button
+                        type="button"
+                        onClick={() => handleOpenSoonModal("Ferramentas Premium")}
+                        className={`inline-flex h-11 w-full items-center justify-center gap-2 rounded-[18px] border text-sm font-semibold transition-all duration-200 ${
+                          isAnnual
+                            ? "border-red-500/30 bg-red-500/10 text-white hover:border-red-500/50 hover:bg-red-500/16"
+                            : "border-white/10 bg-white/[0.04] text-zinc-300 hover:border-white/15 hover:bg-white/[0.06]"
+                        }`}
+                      >
+                        {isAnnual ? (
+                          <>
+                            <Sparkles size={16} />
+                            Acessar ferramentas
+                          </>
+                        ) : (
+                          <>
+                            <Lock size={16} />
+                            Ver ferramentas
+                          </>
+                        )}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+
+          <div className="absolute left-1/2 top-1/2 flex -translate-x-1/2 -translate-y-1/2">
+            <button
+              type="button"
+              onClick={() => navigate("/swipe-max")}
+              className="cursor-pointer select-none text-[30px] font-black leading-none tracking-[-0.05em] sm:text-[36px]"
+            >
+              <span className="text-white">Swipe</span>
+              <span className="text-[#ff4b4b]">MAX</span>
+            </button>
+          </div>
+
+          <div className="ml-auto flex items-center gap-3">
+            <HeaderNotifications />
+
+            <div className="relative" ref={userMenuRef}>
+              <button
+                type="button"
+                onClick={() => setUserMenuOpen((prev) => !prev)}
+                className="group flex items-center justify-center"
+              >
+                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[#ff3b1f] text-sm font-bold text-white shadow-[0_0_24px_rgba(255,59,31,0.30)] transition-all duration-200 group-hover:scale-[1.04]">
+                  {initials}
+                </div>
+              </button>
+
+              {userMenuOpen && (
+                <div className="absolute right-0 top-[calc(100%+12px)] z-[80] w-[300px] overflow-hidden rounded-[28px] border border-white/10 bg-[rgba(7,10,22,0.98)] shadow-[0_30px_90px_rgba(0,0,0,0.62)] backdrop-blur-[38px]">
+                  <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,70,70,0.10),transparent_28%),radial-gradient(circle_at_bottom_left,rgba(59,130,246,0.10),transparent_34%)]" />
+
+                  <div className="relative border-b border-white/10 px-5 py-5">
+                    <p className="truncate text-[16px] font-semibold text-white">
+                      {displayName}
+                    </p>
+                    <p className="truncate text-sm text-zinc-400">{trimmedEmail}</p>
+                  </div>
+
+                  <div className="relative border-b border-white/10 px-5 py-4">
+                    <div className="flex items-center gap-3 rounded-[22px] border border-white/10 bg-[rgba(255,255,255,0.04)] px-4 py-4 backdrop-blur-[18px]">
+                      <div className="flex h-12 w-12 items-center justify-center rounded-[18px] bg-[rgba(255,75,75,0.12)] text-[#ff4b4b]">
+                        <Crown size={20} />
+                      </div>
+
+                      <div className="min-w-0">
+                        <p className="text-xs uppercase tracking-[0.22em] text-zinc-500">
+                          Seu plano
+                        </p>
+                        <p className="truncate text-[17px] font-semibold text-white">
+                          {loadingPlan ? 'Carregando...' : formattedPlan}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="relative p-2">
+                    <button
+                      type="button"
+                      onClick={() =>
+                        window.open("https://wa.me/551153042433", "_blank", "noopener,noreferrer")
+                      }
+                      className="flex w-full items-center justify-between rounded-[22px] px-4 py-4 text-left text-white transition-all duration-200 hover:bg-green-500/10 hover:text-green-400"
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="flex h-10 w-10 items-center justify-center rounded-[14px] border border-green-500/20 bg-green-500/10">
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            viewBox="0 0 32 32"
+                            className="h-5 w-5 fill-green-400"
+                          >
+                            <path d="M16 .396C7.163.396 0 7.56 0 16.396c0 2.885.754 5.593 2.07 7.94L.16 31.64l7.528-1.878a15.94 15.94 0 0 0 8.312 2.285c8.837 0 16-7.164 16-16S24.837.396 16 .396zm0 29.29c-2.52 0-4.873-.684-6.9-1.874l-.493-.29-4.466 1.114 1.19-4.356-.32-.507A13.79 13.79 0 0 1 2.2 16.396c0-7.61 6.19-13.8 13.8-13.8s13.8 6.19 13.8 13.8-6.19 13.8-13.8 13.8zm7.63-10.36c-.417-.208-2.466-1.216-2.848-1.354-.38-.14-.658-.208-.935.208-.277.417-1.073 1.354-1.317 1.633-.243.277-.486.312-.903.104-.417-.208-1.762-.65-3.357-2.072-1.24-1.105-2.078-2.47-2.322-2.887-.243-.417-.026-.643.183-.85.188-.187.417-.486.625-.73.208-.243.277-.417.417-.695.14-.277.07-.52-.035-.73-.104-.208-.935-2.255-1.28-3.09-.336-.806-.678-.697-.935-.71l-.797-.014c-.277 0-.73.104-1.11.52-.38.417-1.456 1.423-1.456 3.466s1.49 4.02 1.698 4.297c.208.277 2.933 4.477 7.104 6.278.994.43 1.77.686 2.375.878.997.317 1.905.272 2.623.165.8-.12 2.466-1.008 2.814-1.982.347-.973.347-1.806.243-1.982-.104-.174-.38-.277-.797-.486z"/>
+                          </svg>
+                        </div>
+
+                        <span className="text-[16px]">Suporte</span>
+                      </div>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={handleProfileClick}
+                      className="flex w-full items-center justify-between rounded-[22px] px-4 py-4 text-left text-white transition-all duration-200 hover:bg-white/[0.05]"
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="flex h-10 w-10 items-center justify-center rounded-[14px] border border-yellow-500/20 bg-yellow-500/10 text-yellow-400">
+                          <User size={18} />
+                        </div>
+
+                        <span className="text-[16px]">Perfil</span>
+                      </div>
+                    </button>
+                  </div>
+
+                  <div className="relative border-t border-white/10 p-2">
+                    <button
+                      type="button"
+                      onClick={signOut}
+                      className="flex w-full items-center gap-3 rounded-[22px] px-4 py-4 text-left text-white transition-all duration-200 hover:bg-red-500/10 hover:text-red-400"
+                    >
+                      <LogOut size={20} />
+                      <span className="text-[16px]">Sair</span>
                     </button>
                   </div>
                 </div>
-              </div>
-            )}
+              )}
+            </div>
           </div>
         </div>
 
-        <div className="absolute left-1/2 top-1/2 flex -translate-x-1/2 -translate-y-1/2">
+        <ProfileModal
+          open={profileModalOpen}
+          onClose={() => setProfileModalOpen(false)}
+          user={user}
+          plan={formattedPlan}
+        />
+      </header>
+
+      {soonModalOpen && (
+        <div className="fixed inset-0 z-[120] flex items-center justify-center p-4">
           <button
             type="button"
-            onClick={() => navigate("/swipe-max")}
-            className="cursor-pointer select-none text-[30px] font-black leading-none tracking-[-0.05em] sm:text-[36px]"
-          >
-            <span className="text-white">Swipe</span>
-            <span className="text-[#ff4b4b]">MAX</span>
-          </button>
-        </div>
+            aria-label="Fechar modal"
+            onClick={() => setSoonModalOpen(false)}
+            className="absolute inset-0 bg-black/70 backdrop-blur-[3px]"
+          />
 
-        <div className="ml-auto flex items-center gap-3">
-          
-          <HeaderNotifications />
+          <div className="relative z-[121] w-full max-w-[460px] overflow-hidden rounded-[28px] border border-white/10 bg-[rgba(7,10,22,0.98)] shadow-[0_30px_90px_rgba(0,0,0,0.62)] backdrop-blur-[38px]">
+            <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(255,70,70,0.12),transparent_30%),radial-gradient(circle_at_bottom_right,rgba(59,130,246,0.10),transparent_35%)]" />
 
-          <div className="relative" ref={userMenuRef}>
-            <button
-              type="button"
-              onClick={() => setUserMenuOpen((prev) => !prev)}
-              className="group flex items-center justify-center"
-            >
-              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[#ff3b1f] text-sm font-bold text-white shadow-[0_0_24px_rgba(255,59,31,0.30)] transition-all duration-200 group-hover:scale-[1.04]">
-                {initials}
+            <div className="relative flex items-start justify-between border-b border-white/10 px-5 py-5">
+              <div>
+                <p className="text-[18px] font-semibold text-white">
+                  {soonModalTitle}
+                </p>
+                <p className="mt-1 text-sm text-zinc-400">
+                  Essa ferramenta ainda não foi liberada.
+                </p>
               </div>
-            </button>
 
-            {userMenuOpen && (
-              <div className="absolute right-0 top-[calc(100%+12px)] z-[80] w-[300px] overflow-hidden rounded-[28px] border border-white/10 bg-[rgba(7,10,22,0.98)] shadow-[0_30px_90px_rgba(0,0,0,0.62)] backdrop-blur-[38px]">
-                <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,70,70,0.10),transparent_28%),radial-gradient(circle_at_bottom_left,rgba(59,130,246,0.10),transparent_34%)]" />
+              <button
+                type="button"
+                onClick={() => setSoonModalOpen(false)}
+                className="flex h-10 w-10 items-center justify-center rounded-[14px] border border-white/10 bg-white/[0.04] text-zinc-300 transition-all duration-200 hover:bg-white/[0.08] hover:text-white"
+              >
+                <X size={18} />
+              </button>
+            </div>
 
-                <div className="relative border-b border-white/10 px-5 py-5">
-                  <p className="truncate text-[16px] font-semibold text-white">
-                    {displayName}
-                  </p>
-                  <p className="truncate text-sm text-zinc-400">{trimmedEmail}</p>
-                </div>
+            <div className="relative px-5 py-5">
+              <div className="rounded-[22px] border border-white/10 bg-white/[0.04] p-4">
+                <p className="text-sm leading-6 text-zinc-300">
+                  Estamos finalizando os últimos ajustes para liberar essa área
+                  com o padrão certo dentro do MAX.
+                </p>
 
-                <div className="relative border-b border-white/10 px-5 py-4">
-                  <div className="flex items-center gap-3 rounded-[22px] border border-white/10 bg-[rgba(255,255,255,0.04)] px-4 py-4 backdrop-blur-[18px]">
-                    <div className="flex h-12 w-12 items-center justify-center rounded-[18px] bg-[rgba(255,75,75,0.12)] text-[#ff4b4b]">
-                      <Crown size={20} />
-                    </div>
-
-                    <div className="min-w-0">
-                      <p className="text-xs uppercase tracking-[0.22em] text-zinc-500">
-                        Seu plano
-                      </p>
-                      <p className="truncate text-[17px] font-semibold text-white">
-                        {loadingPlan ? 'Carregando...' : formattedPlan}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="relative p-2">
-                  <button
-                    type="button"
-                    onClick={() =>
-                      window.open("https://wa.me/551153042433", "_blank", "noopener,noreferrer")
-                    }
-                    className="flex w-full items-center justify-between rounded-[22px] px-4 py-4 text-left text-white transition-all duration-200 hover:bg-green-500/10 hover:text-green-400"
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className="flex h-10 w-10 items-center justify-center rounded-[14px] border border-green-500/20 bg-green-500/10">
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          viewBox="0 0 32 32"
-                          className="h-5 w-5 fill-green-400"
-                        >
-                          <path d="M16 .396C7.163.396 0 7.56 0 16.396c0 2.885.754 5.593 2.07 7.94L.16 31.64l7.528-1.878a15.94 15.94 0 0 0 8.312 2.285c8.837 0 16-7.164 16-16S24.837.396 16 .396zm0 29.29c-2.52 0-4.873-.684-6.9-1.874l-.493-.29-4.466 1.114 1.19-4.356-.32-.507A13.79 13.79 0 0 1 2.2 16.396c0-7.61 6.19-13.8 13.8-13.8s13.8 6.19 13.8 13.8-6.19 13.8-13.8 13.8zm7.63-10.36c-.417-.208-2.466-1.216-2.848-1.354-.38-.14-.658-.208-.935.208-.277.417-1.073 1.354-1.317 1.633-.243.277-.486.312-.903.104-.417-.208-1.762-.65-3.357-2.072-1.24-1.105-2.078-2.47-2.322-2.887-.243-.417-.026-.643.183-.85.188-.187.417-.486.625-.73.208-.243.277-.417.417-.695.14-.277.07-.52-.035-.73-.104-.208-.935-2.255-1.28-3.09-.336-.806-.678-.697-.935-.71l-.797-.014c-.277 0-.73.104-1.11.52-.38.417-1.456 1.423-1.456 3.466s1.49 4.02 1.698 4.297c.208.277 2.933 4.477 7.104 6.278.994.43 1.77.686 2.375.878.997.317 1.905.272 2.623.165.8-.12 2.466-1.008 2.814-1.982.347-.973.347-1.806.243-1.982-.104-.174-.38-.277-.797-.486z"/>
-                        </svg>
-                      </div>
-
-                      <span className="text-[16px]">Suporte</span>
-                    </div>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={handleProfileClick}
-                    className="flex w-full items-center justify-between rounded-[22px] px-4 py-4 text-left text-white transition-all duration-200 hover:bg-white/[0.05]"
-                  >
-                    <div className="flex items-center gap-3">
-                      <div className="flex h-10 w-10 items-center justify-center rounded-[14px] border border-yellow-500/20 bg-yellow-500/10 text-yellow-400">
-                        <User size={18} />
-                      </div>
-
-                      <span className="text-[16px]">Perfil</span>
-                    </div>
-                  </button>
-                </div>
-
-                <div className="relative border-t border-white/10 p-2">
-                  <button
-                    type="button"
-                    onClick={signOut}
-                    className="flex w-full items-center gap-3 rounded-[22px] px-4 py-4 text-left text-white transition-all duration-200 hover:bg-red-500/10 hover:text-red-400"
-                  >
-                    <LogOut size={20} />
-                    <span className="text-[16px]">Sair</span>
-                  </button>
-                </div>
+                <p className="mt-3 text-sm leading-6 text-zinc-500">
+                  Em breve ela estará disponível para acesso.
+                </p>
               </div>
-            )}
+
+              <div className="mt-4">
+                <button
+                  type="button"
+                  onClick={() => setSoonModalOpen(false)}
+                  className="inline-flex h-11 w-full items-center justify-center rounded-[18px] border border-red-500/30 bg-red-500/10 text-sm font-semibold text-white transition-all duration-200 hover:border-red-500/50 hover:bg-red-500/16"
+                >
+                  Entendi
+                </button>
+              </div>
+            </div>
           </div>
         </div>
-      </div>
-
-      <ProfileModal
-        open={profileModalOpen}
-        onClose={() => setProfileModalOpen(false)}
-        user={user}
-        plan={formattedPlan}
-      />
-    </header>
+      )}
+    </>
   );
 };
 

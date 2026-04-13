@@ -198,6 +198,8 @@ export default function SwipeMax() {
   const [sortBy, setSortBy] = useState("recent");
   const [showPricingModal, setShowPricingModal] = useState(false);
   const [showInvisibleModal, setShowInvisibleModal] = useState(false);
+  const [showSoonModal, setShowSoonModal] = useState(false);
+  const [soonModalTitle, setSoonModalTitle] = useState("Ferramentas Premium");
   const [downloadState, setDownloadState] = useState<DownloadState>({
     key: null,
     status: "idle",
@@ -381,6 +383,11 @@ export default function SwipeMax() {
     setShowPricingModal(false);
   }
 
+    function openSoonModal(title: string) {
+    setSoonModalTitle(title);
+    setShowSoonModal(true);
+  }
+
   function handlePremiumRoute(route: string) {
     if (!isAnnual) {
       openPricingModal();
@@ -521,7 +528,7 @@ export default function SwipeMax() {
                   )
                 }
                 buttonLabel={isAnnual ? "Acessar ferramentas" : "Ver planos"}
-                onClick={() => handlePremiumRoute("/ferramentas")}
+                                onClick={() => openSoonModal("Ferramentas Premium")}
               />
             </section>
 
@@ -797,6 +804,64 @@ export default function SwipeMax() {
           onClose={() => setShowInvisibleModal(false)}
         />
       )}
+
+            {showSoonModal && (
+        <div className="fixed inset-0 z-[120] flex items-center justify-center p-4">
+          <button
+            type="button"
+            aria-label="Fechar modal"
+            onClick={() => setShowSoonModal(false)}
+            className="absolute inset-0 bg-black/70 backdrop-blur-[3px]"
+          />
+
+          <div className="relative z-[121] w-full max-w-[460px] overflow-hidden rounded-[28px] border border-white/10 bg-[rgba(7,10,22,0.98)] shadow-[0_30px_90px_rgba(0,0,0,0.62)] backdrop-blur-[38px]">
+            <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(255,70,70,0.12),transparent_30%),radial-gradient(circle_at_bottom_right,rgba(59,130,246,0.10),transparent_35%)]" />
+
+            <div className="relative flex items-start justify-between border-b border-white/10 px-5 py-5">
+              <div>
+                <p className="text-[18px] font-semibold text-white">
+                  {soonModalTitle}
+                </p>
+                <p className="mt-1 text-sm text-zinc-400">
+                  Essa ferramenta ainda não foi liberada.
+                </p>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setShowSoonModal(false)}
+                className="flex h-10 w-10 items-center justify-center rounded-[14px] border border-white/10 bg-white/[0.04] text-zinc-300 transition-all duration-200 hover:bg-white/[0.08] hover:text-white"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+
+            <div className="relative px-5 py-5">
+              <div className="rounded-[22px] border border-white/10 bg-white/[0.04] p-4">
+                <p className="text-sm leading-6 text-zinc-300">
+                  Estamos finalizando os últimos ajustes para liberar essa área
+                  com o padrão certo dentro do MAX.
+                </p>
+
+                <p className="mt-3 text-sm leading-6 text-zinc-500">
+                  Em breve ela estará disponível para acesso.
+                </p>
+              </div>
+
+              <div className="mt-4">
+                <button
+                  type="button"
+                  onClick={() => setShowSoonModal(false)}
+                  className="inline-flex h-11 w-full items-center justify-center rounded-[18px] border border-red-500/30 bg-red-500/10 text-sm font-semibold text-white transition-all duration-200 hover:border-red-500/50 hover:bg-red-500/16"
+                >
+                  Entendi
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
     </>
   );
 }
