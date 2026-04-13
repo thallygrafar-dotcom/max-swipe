@@ -1,6 +1,7 @@
 import React, { memo, useMemo, useState } from "react";
 import { User } from "lucide-react";
 import { motion } from "framer-motion";
+import RadarMaxWidget from "@/components/RadarMaxWidget";
 import {
   ArrowUpRight,
   BadgeDollarSign,
@@ -418,6 +419,8 @@ export default function HomeLanding() {
   transition={{ duration: 0.6, delay: 0.15 }}
   className="mt-6"
 >
+
+  
   <a
     href="#planos"
     className="
@@ -738,6 +741,7 @@ export default function HomeLanding() {
           </div>
         </DialogContent>
       </Dialog>
+      <RadarMaxWidget />
     </div>
   );
 }
