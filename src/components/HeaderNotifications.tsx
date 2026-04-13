@@ -57,23 +57,40 @@ const HeaderNotifications = () => {
     };
   }, [fetchNotifications]);
 
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        wrapperRef.current &&
+        !wrapperRef.current.contains(event.target as Node)
+      ) {
+        setOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
   const handleMarkAsRead = async (notification: HeaderNotification) => {
     const sb = supabase as any;
 
-    await sb
-      .from("notifications")
-      .update({ read: true })
-      .eq("id", notification.id);
+    await sb.from("notifications").update({ read: true }).eq("id", notification.id);
 
     const updated = { ...notification, read: true };
 
     setNotifications((prev) =>
-      prev.map((item) =>
-        item.id === notification.id ? updated : item
-      )
+      prev.map((item) => (item.id === notification.id ? updated : item))
     );
 
     setSelectedNotification(updated);
+    setOpen(false);
+  };
+
+  const handleCloseSelectedNotification = () => {
+    setSelectedNotification(null);
   };
 
   return (
@@ -106,23 +123,51 @@ const HeaderNotifications = () => {
       </div>
 
       {selectedNotification && (
-        <div className="fixed inset-0 z-[120] flex items-center justify-center bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="animate-in zoom-in-95 duration-200 w-full max-w-[520px] rounded-[28px] border border-white/10 bg-[#070A16] shadow-[0_30px_90px_rgba(0,0,0,0.62)]">
+        <div className="fixed inset-0 z-[120] flex items-center justify-center bg-black/70 px-4 backdrop-blur-[6px] animate-in fade-in duration-200">
+          <button
+            type="button"
+            aria-label="Fechar modal"
+            onClick={handleCloseSelectedNotification}
+            className="absolute inset-0"
+          />
+
+          <div className="relative w-full max-w-[540px] overflow-hidden rounded-[32px] border border-white/10 bg-[rgba(7,10,22,0.96)] shadow-[0_40px_120px_rgba(0,0,0,0.7)] backdrop-blur-[30px] animate-in zoom-in-95 duration-200">
+            <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(255,70,70,0.12),transparent_28%),radial-gradient(circle_at_bottom_right,rgba(59,130,246,0.08),transparent_35%)]" />
+
             <div className="relative border-b border-white/10 px-6 py-5">
               <button
-                onClick={() => setSelectedNotification(null)}
-                className="absolute right-4 top-4"
+                onClick={handleCloseSelectedNotification}
+                className="absolute right-4 top-4 flex h-10 w-10 items-center justify-center rounded-[14px] border border-white/10 bg-white/[0.04] text-zinc-300 transition hover:bg-white/[0.08] hover:text-white"
               >
-                <X />
+                <X size={16} />
               </button>
 
-              <p className="text-xl font-semibold text-white">
-                {selectedNotification.title}
-              </p>
+              <div className="pr-12">
+                <div className="mb-3 inline-flex items-center rounded-full border border-red-500/20 bg-red-500/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-red-300">
+                  Notificação
+                </div>
+
+                <p className="text-[20px] font-semibold leading-tight tracking-[-0.03em] text-white">
+                  {selectedNotification.title}
+                </p>
+
+                <div className="mt-3 h-[2px] w-12 rounded-full bg-gradient-to-r from-red-500 to-transparent" />
+              </div>
             </div>
 
-            <div className="px-6 py-5 text-zinc-300">
-              {selectedNotification.description}
+            <div className="relative px-6 py-6">
+              <p className="whitespace-pre-line text-[14px] leading-7 text-zinc-300">
+                {selectedNotification.description}
+              </p>
+
+              <div className="mt-6 flex justify-end">
+                <button
+                  onClick={handleCloseSelectedNotification}
+                  className="inline-flex h-11 items-center justify-center rounded-[16px] border border-red-500/30 bg-red-500/10 px-5 text-sm font-semibold text-white transition hover:border-red-500/50 hover:bg-red-500/20"
+                >
+                  Fechar
+                </button>
+              </div>
             </div>
           </div>
         </div>

@@ -6,6 +6,7 @@ import SwipeHeader from "@/components/SwipeHeader";
 import SwipeFooter from "@/components/SwipeFooter";
 import SwipeMaxPricingModal from "@/components/SwipeMaxPricingModal";
 import SwipeMaxInvisibleModal from "@/components/SwipeMaxInvisibleModal";
+import RadarPageModal from "@/components/RadarPageModal";
 import {
   Search,
   ChevronDown,
@@ -151,6 +152,7 @@ function slugifyFileName(value: string) {
     .replace(/^-+|-+$/g, "")
     .replace(/-+/g, "-");
 }
+
 
 async function forceDownload(url: string, filename: string) {
   try {
@@ -430,6 +432,7 @@ export default function SwipeMax() {
 
   return (
     <>
+    <RadarPageModal />
       <style>{`
         html {
           scrollbar-width: thin;
