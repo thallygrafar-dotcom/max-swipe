@@ -565,20 +565,24 @@ export default function HomeLanding() {
           <div className="mx-auto mt-12 grid max-w-[1020px] gap-6 sm:mt-14 lg:grid-cols-2">
             <PlanCard
               title="Mensal"
-              price="R$ 147"
+              price="R$147"
               subtitle="por mês"
               items={monthlyItems}
               buttonLabel="Assinar Mensal"
             />
 
             <PlanCard
-              title="Anual"
-              price="R$ 1.497"
-              subtitle="ou em até 12x"
-              featured
-              items={annualItems}
-              buttonLabel="Assinar Anual"
-            />
+  title="Anual"
+  price="R$ 1.497"
+  subtitle="ou em até 12x"
+  featured
+  items={annualItems}
+  buttonLabel="Assinar Anual"
+  installmentText="por apenas"
+  installmentValue="R$155"
+  installmentTimes="12x"
+  cashText="ou R$1.497,00 à vista"
+/>
           </div>
         </div>
       </section>
@@ -664,17 +668,44 @@ export default function HomeLanding() {
 
             <footer className="border-t border-white/8 bg-black/40">
         <div className="mx-auto flex w-full max-w-[1240px] flex-col items-center justify-between gap-5 px-4 py-8 text-center sm:px-6">
-          <div className="flex items-center gap-3">
-            <div
-              className="relative flex h-9 w-9 items-center justify-center rounded-2xl border border-red-400/20 bg-red-600 font-bold text-white shadow-[0_10px_24px_rgba(239,68,68,0.24)]"
-              style={TRANSFORM_GPU_STYLE}
-            >
-              S
-            </div>
-            <Brand className="text-[18px] font-extrabold tracking-[-0.05em]" />
-          </div>
+          
+          <div className="flex items-center gap-4">
+  {/* LOGO */}
+  <div className="flex items-center gap-3">
+    <div
+      className="relative flex h-9 w-9 items-center justify-center rounded-2xl border border-red-400/20 bg-red-600 font-bold text-white shadow-[0_10px_24px_rgba(239,68,68,0.24)]"
+    >
+      S
+    </div>
+    <Brand className="text-[18px] font-extrabold tracking-[-0.05em]" />
+  </div>
+
+  {/* DIVISOR */}
+  <div className="h-5 w-px bg-white/10" />
+
+  {/* SUPORTE */}
+  <a
+    href="https://wa.me/551153042433"
+    target="_blank"
+    rel="noreferrer"
+    className="flex items-center gap-2 text-white transition hover:text-red-400"
+  >
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 32 32"
+      className="h-4 w-4 fill-current"
+    >
+      <path d="M16 .396C7.163.396 0 7.559 0 16.396c0 2.893.757 5.617 2.073 7.986L0 32l7.83-2.052A15.9 15.9 0 0 0 16 32c8.837 0 16-7.163 16-16.396C32 7.559 24.837.396 16 .396zm0 29.206a13.01 13.01 0 0 1-6.63-1.812l-.474-.282-4.647 1.218 1.24-4.527-.309-.465a13.012 13.012 0 1 1 10.82 5.868zm7.305-9.733c-.4-.2-2.37-1.17-2.737-1.303-.367-.133-.633-.2-.9.2-.267.4-1.033 1.303-1.267 1.57-.233.267-.467.3-.867.1-.4-.2-1.687-.622-3.213-1.984-1.187-1.06-1.987-2.37-2.22-2.77-.233-.4-.025-.616.175-.816.18-.18.4-.467.6-.7.2-.233.267-.400.400-.667.133-.267.067-.500-.033-.700-.100-.200-.900-2.170-1.233-2.970-.325-.780-.655-.673-.900-.685l-.767-.013c-.267 0-.700.100-1.067.500-.367.400-1.400 1.367-1.400 3.333 0 1.967 1.433 3.867 1.633 4.133.200.267 2.820 4.307 6.833 6.037.955.412 1.700.658 2.280.842.958.305 1.830.262 2.520.159.768-.114 2.370-.967 2.705-1.900.333-.933.333-1.733.233-1.900-.100-.167-.367-.267-.767-.467z" />
+    </svg>
+
+    <span className="text-[14px] font-medium">
+      Falar com suporte
+    </span>
+  </a>
+</div>
 
           <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-3 text-[14px] text-zinc-400">
+            
             <button
               type="button"
               onClick={() => openModal("termos")}
@@ -836,6 +867,10 @@ function PlanCard({
   items,
   buttonLabel,
   featured = false,
+  installmentText,
+  installmentValue,
+  installmentTimes,
+  cashText,
 }: {
   title: string;
   price: string;
@@ -843,6 +878,10 @@ function PlanCard({
   items: { label: string; included: boolean }[];
   buttonLabel: string;
   featured?: boolean;
+  installmentText?: string;
+  installmentValue?: string;
+  installmentTimes?: string;
+  cashText?: string;
 }) {
   return (
     <motion.div
@@ -879,14 +918,40 @@ function PlanCard({
             {title}
           </h3>
 
-          <div className="mt-5 flex flex-col items-center justify-center">
-            <div className="text-[52px] font-extrabold leading-none tracking-[-0.08em] text-white sm:text-[62px]">
-              {price}
-            </div>
-            <div className="mt-2 text-[15px] text-zinc-400 sm:text-[16px]">
-              {subtitle}
-            </div>
-          </div>
+          <div className="mt-6 flex flex-col items-center justify-center">
+  {featured && installmentValue ? (
+    <>
+      <div className="flex w-full items-center justify-center gap-2 sm:gap-3">
+        <div className="w-[55px] shrink-0 text-right leading-[0.9] text-white sm:w-[65px]">
+  <div className="text-[14px] font-normal sm:text-[15px]">
+    {installmentText}
+  </div>
+  <div className="text-[18px] font-normal sm:text-[20px]">
+    {installmentTimes}
+  </div>
+</div>
+
+        <div className="text-center text-[44px] font-black leading-none tracking-[-0.06em] text-[#ff3b3b] sm:text-[64px] lg:text-[72px]">
+          {installmentValue}
+        </div>
+      </div>
+
+      <div className="mt-2 text-center text-[15px] text-zinc-400 sm:text-[16px]">
+  {cashText}
+</div>
+    </>
+  ) : (
+
+    <>
+      <div className="text-[52px] font-extrabold leading-none tracking-[-0.08em] text-white sm:text-[62px]">
+        {price}
+      </div>
+      <div className="mt-2 text-[15px] text-zinc-400 sm:text-[16px]">
+        {subtitle}
+      </div>
+    </>
+  )}
+</div>
         </motion.div>
 
         <div className="mt-7 h-px bg-white/8" />
