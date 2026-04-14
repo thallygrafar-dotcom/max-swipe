@@ -13,6 +13,8 @@ import PaginaAdvertorial from "./pages/PaginaAdvertorial";
 import Ferramentas from "@/pages/Ferramentas";
 import AdminNotifications from "@/pages/AdminNotifications";
 import HomeLanding from "./pages/HomeLanding";
+import RadarPageAdmin from "@/pages/RadarPageAdmin";
+import RadarPage from "@/pages/RadarPage";
 
 function LoadingScreen() {
   return (
@@ -89,6 +91,10 @@ function AppRoutes() {
       <Route path="/pagina-advertorial" element={<PaginaAdvertorial />} />
 
       <Route path="/admin-notificacoes" element={<AdminNotifications />} />
+
+      <Route path="/radar-admin" element={<RadarPageAdmin />} />
+
+      <Route path="/radarpage" element={<RadarPage />} />
 
       <Route
         path="/admin-users"

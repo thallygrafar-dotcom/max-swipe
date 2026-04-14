@@ -7,6 +7,7 @@ import SwipeFooter from "@/components/SwipeFooter";
 import SwipeMaxPricingModal from "@/components/SwipeMaxPricingModal";
 import SwipeMaxInvisibleModal from "@/components/SwipeMaxInvisibleModal";
 import RadarPageModal from "@/components/RadarPageModal";
+
 import {
   Search,
   ChevronDown,
@@ -432,7 +433,6 @@ export default function SwipeMax() {
 
   return (
     <>
-    <RadarPageModal />
       <style>{`
         html {
           scrollbar-width: thin;
@@ -503,7 +503,7 @@ export default function SwipeMax() {
                     Acesso liberado
                   </div>
                 }
-                buttonLabel="Explorar biblioteca"
+                buttonLabel="Explorar Biblioteca"
                 onClick={() =>
                   window.scrollTo({
                     top: 520,
@@ -529,8 +529,15 @@ export default function SwipeMax() {
       </div>
     )
   }
-  buttonLabel={isAnnual ? "Explorar RadarPage" : "Em Breve"}
-  onClick={() => openSoonModal("RadarPage")}
+  buttonLabel={isAnnual ? "Explorar RadarPage" : "Explorar RadarPage"}
+  onClick={() => {
+  if (!isAnnual) {
+    setShowPricingModal(true);
+    return;
+  }
+
+  navigate("/radarpage");
+}}
 />
               <DashboardHeroCard
                 eyebrow="Builders"
@@ -550,7 +557,7 @@ export default function SwipeMax() {
                     </div>
                   )
                 }
-                buttonLabel={isAnnual ? "Acessar ferramentas" : "Em Breve"}
+                buttonLabel={isAnnual ? "Acessar ferramentas" : "Explorar Builders"}
                                 onClick={() => openSoonModal("Ferramentas Premium")}
               />
             </section>

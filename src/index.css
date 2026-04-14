@@ -4,6 +4,9 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ========================= */
+/* BASE VARIABLES */
+/* ========================= */
 @layer base {
   :root {
     --background: 0 0% 6%;
@@ -70,6 +73,9 @@
   }
 }
 
+/* ========================= */
+/* BASE STYLES */
+/* ========================= */
 @layer base {
   * {
     @apply border-border;
@@ -88,6 +94,9 @@
   }
 }
 
+/* ========================= */
+/* COMPONENTS */
+/* ========================= */
 @layer components {
   .headline-primary {
     @apply text-foreground font-black leading-tight tracking-tight;
@@ -117,119 +126,65 @@
     box-shadow: 0 6px 20px hsla(0, 75%, 50%, 0.4);
     filter: brightness(1.1);
   }
-
-  .symptom-list li {
-    @apply flex items-start gap-3 py-1.5;
-  }
-
-  .symptom-list li::before {
-    content: '✕';
-    @apply font-bold flex-shrink-0 text-sm mt-0.5;
-    color: hsl(0 70% 55%);
-  }
-
-  .featured-list li {
-    @apply flex items-start gap-2 py-1.5 text-sm;
-  }
-
-  .featured-list li::before {
-    content: '➕';
-    @apply flex-shrink-0 text-xs mt-0.5;
-    color: hsl(142 70% 45%);
-  }
-
-  .news-section {
-    @apply max-w-3xl;
-  }
-
-  .sidebar-card {
-    @apply bg-card rounded-lg p-5 shadow-sm border border-border;
-  }
-
-  .navy-header {
-    background-color: hsl(230 50% 20%);
-    @apply text-white py-3;
-  }
-
-  .navy-footer {
-    background-color: hsl(230 50% 20%);
-    @apply text-white py-10;
-  }
-
-  .testimonial-quote {
-    @apply italic text-lg leading-relaxed;
-    font-family: 'Merriweather', Georgia, serif;
-  }
-
-  .article-lead {
-    @apply text-lg leading-relaxed mb-4;
-  }
-
-  .byline {
-    @apply text-muted-foreground text-sm mb-4;
-  }
-
-  .promo-card {
-    @apply rounded-lg overflow-hidden;
-    background: linear-gradient(to bottom, hsl(230 50% 25%), hsl(230 50% 20%));
-  }
-
-  .promo-card-content {
-    @apply p-5 text-white text-center;
-  }
-
-  .related-article {
-    @apply py-3 border-b border-border last:border-b-0;
-  }
-
-  .related-article-title {
-    @apply font-semibold text-foreground hover:text-primary transition-colors cursor-pointer text-sm leading-snug;
-    font-family: 'Merriweather', Georgia, serif;
-  }
-
-  .related-article-meta {
-    @apply text-xs text-muted-foreground mt-1;
-  }
 }
 
-@layer utilities {
-  .font-display {
-    font-family: var(--font-display);
-  }
-  .font-body {
-    font-family: var(--font-body);
-  }
-  .font-headline {
-    font-family: 'Merriweather', Georgia, serif;
-  }
-  .tabular-nums {
-    font-variant-numeric: tabular-nums;
-  }
-  .quote-icon {
-    @apply text-4xl text-primary leading-none;
-    font-family: Georgia, serif;
-  }
+/* ========================= */
+/* SCROLL SWIPEMAX (GLOBAL) */
+/* ========================= */
+
+html {
+  scrollbar-width: thin;
+  scrollbar-color: #ef4444 #0c0c10;
 }
+
+body {
+  scrollbar-width: thin;
+  scrollbar-color: #ef4444 #0c0c10;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: #0c0c10;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #ef4444, #991b1b);
+  border-radius: 999px;
+  border: 2px solid #0c0c10;
+  box-shadow: 0 0 8px rgba(239, 68, 68, 0.5);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #f87171, #ef4444);
+}
+
+/* ========================= */
+/* SCROLL CUSTOM (SELETIVO) */
+/* ========================= */
 
 .custom-scroll::-webkit-scrollbar {
   width: 8px;
 }
 
 .custom-scroll::-webkit-scrollbar-track {
-  background: #0f0f0f;
+  background: #0c0c10;
 }
 
 .custom-scroll::-webkit-scrollbar-thumb {
-  background: #3a3a3a;
+  background: linear-gradient(180deg, #ef4444, #991b1b);
   border-radius: 999px;
+  box-shadow: 0 0 6px rgba(239, 68, 68, 0.5);
 }
 
 .custom-scroll::-webkit-scrollbar-thumb:hover {
-  background: #555;
+  background: linear-gradient(180deg, #f87171, #ef4444);
 }
 
 /* Firefox */
 .custom-scroll {
   scrollbar-width: thin;
-  scrollbar-color: #3a3a3a #0f0f0f;
+  scrollbar-color: #ef4444 #0c0c10;
 }

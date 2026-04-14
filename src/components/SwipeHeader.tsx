@@ -1,20 +1,21 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from "react";
+import SwipeMaxPricingModal from "@/components/SwipeMaxPricingModal";
 import {
   Menu,
   User,
   LogOut,
   Crown,
-  WalletCards,
   FileText,
   Sparkles,
   Wand2,
   LayoutTemplate,
   Lock,
   X,
-} from 'lucide-react';
-import { useAuth } from '@/hooks/useAuth';
-import ProfileModal from '@/components/ProfileModal';
-import { supabase } from '@/integrations/supabase/client';
+  ArrowRight,
+} from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
+import ProfileModal from "@/components/ProfileModal";
+import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import HeaderNotifications from "@/components/HeaderNotifications";
 
@@ -23,7 +24,7 @@ interface GlobalHeaderProps {
   showSidebarToggle?: boolean;
 }
 
-type UserPlan = 'monthly' | 'annual' | null;
+type UserPlan = "monthly" | "annual" | null;
 
 type SubscriptionRow = {
   plan_type?: string | null;
@@ -43,12 +44,14 @@ const GlobalHeader = ({
   const [userPlan, setUserPlan] = useState<UserPlan>(null);
   const [loadingPlan, setLoadingPlan] = useState(true);
   const [profileModalOpen, setProfileModalOpen] = useState(false);
+  const [showPricingModal, setShowPricingModal] = useState(false);
+
   const navigate = useNavigate();
 
   const userMenuRef = useRef<HTMLDivElement | null>(null);
   const hamburgerMenuRef = useRef<HTMLDivElement | null>(null);
 
-  const authEmail = user?.email ?? '';
+  const authEmail = user?.email ?? "";
   const trimmedEmail = authEmail.trim();
   const loweredEmail = trimmedEmail.toLowerCase();
 
@@ -58,45 +61,43 @@ const GlobalHeader = ({
   const displayName =
     user?.user_metadata?.full_name ||
     user?.user_metadata?.name ||
-    trimmedEmail.split('@')[0] ||
-    'Usuário';
+    trimmedEmail.split("@")[0] ||
+    "Usuário";
 
   const initials = useMemo(() => {
     const fullName =
-      user?.user_metadata?.full_name ||
-      user?.user_metadata?.name ||
-      '';
+      user?.user_metadata?.full_name || user?.user_metadata?.name || "";
 
     if (fullName.trim()) {
-      const parts = fullName.trim().split(' ').filter(Boolean);
+      const parts = fullName.trim().split(" ").filter(Boolean);
 
       if (parts.length === 1) {
         return parts[0].slice(0, 2).toUpperCase();
       }
 
-      return `${parts[0]?.[0] ?? ''}${parts[1]?.[0] ?? ''}`.toUpperCase();
+      return `${parts[0]?.[0] ?? ""}${parts[1]?.[0] ?? ""}`.toUpperCase();
     }
 
-    const emailName = trimmedEmail.split('@')[0] || 'US';
+    const emailName = trimmedEmail.split("@")[0] || "US";
     return emailName.slice(0, 2).toUpperCase();
   }, [user, trimmedEmail]);
 
   const formattedPlan = useMemo(() => {
-    if (userPlan === 'annual') return 'Plano Anual';
-    if (userPlan === 'monthly') return 'Plano Mensal';
-    return 'Sem plano ativo';
+    if (userPlan === "annual") return "Plano Anual";
+    if (userPlan === "monthly") return "Plano Mensal";
+    return "Sem plano ativo";
   }, [userPlan]);
 
-  const isAnnual = userPlan === 'annual';
+  const isAnnual = userPlan === "annual";
 
   useEffect(() => {
     const normalizePlan = (value?: string | null): UserPlan => {
-      const plan = String(value || '')
+      const plan = String(value || "")
         .trim()
         .toLowerCase();
 
-      if (plan === 'annual') return 'annual';
-      if (plan === 'monthly') return 'monthly';
+      if (plan === "annual") return "annual";
+      if (plan === "monthly") return "monthly";
       return null;
     };
 
@@ -114,14 +115,10 @@ const GlobalHeader = ({
         let rows: SubscriptionRow[] = [];
 
         const exactResult = await sb
-          .from('swipemax_subscriptions')
-          .select('email, plan_type, created_at, access_expires_at')
-          .eq('email', trimmedEmail)
-          .order('created_at', { ascending: false });
-
-        if (exactResult?.error) {
-          console.error('Erro busca exata:', exactResult.error);
-        }
+          .from("swipemax_subscriptions")
+          .select("email, plan_type, created_at, access_expires_at")
+          .eq("email", trimmedEmail)
+          .order("created_at", { ascending: false });
 
         if (Array.isArray(exactResult?.data) && exactResult.data.length > 0) {
           rows = exactResult.data;
@@ -129,14 +126,10 @@ const GlobalHeader = ({
 
         if (rows.length === 0 && loweredEmail !== trimmedEmail) {
           const lowerResult = await sb
-            .from('swipemax_subscriptions')
-            .select('email, plan_type, created_at, access_expires_at')
-            .eq('email', loweredEmail)
-            .order('created_at', { ascending: false });
-
-          if (lowerResult?.error) {
-            console.error('Erro busca lowercase:', lowerResult.error);
-          }
+            .from("swipemax_subscriptions")
+            .select("email, plan_type, created_at, access_expires_at")
+            .eq("email", loweredEmail)
+            .order("created_at", { ascending: false });
 
           if (Array.isArray(lowerResult?.data) && lowerResult.data.length > 0) {
             rows = lowerResult.data;
@@ -145,14 +138,10 @@ const GlobalHeader = ({
 
         if (rows.length === 0) {
           const ilikeResult = await sb
-            .from('swipemax_subscriptions')
-            .select('email, plan_type, created_at, access_expires_at')
-            .ilike('email', loweredEmail)
-            .order('created_at', { ascending: false });
-
-          if (ilikeResult?.error) {
-            console.error('Erro busca ilike:', ilikeResult.error);
-          }
+            .from("swipemax_subscriptions")
+            .select("email, plan_type, created_at, access_expires_at")
+            .ilike("email", loweredEmail)
+            .order("created_at", { ascending: false });
 
           if (Array.isArray(ilikeResult?.data) && ilikeResult.data.length > 0) {
             rows = ilikeResult.data;
@@ -187,7 +176,7 @@ const GlobalHeader = ({
 
         setUserPlan(normalizePlan(chosenRow.plan_type));
       } catch (err) {
-        console.error('Erro inesperado ao buscar plano:', err);
+        console.error("Erro inesperado ao buscar plano:", err);
         setUserPlan(null);
       } finally {
         setLoadingPlan(false);
@@ -214,43 +203,55 @@ const GlobalHeader = ({
     };
 
     const handleEscape = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') {
+      if (event.key === "Escape") {
         setUserMenuOpen(false);
         setHamburgerMenuOpen(false);
         setSoonModalOpen(false);
+        setShowPricingModal(false);
       }
     };
 
     const previousOverflow = document.body.style.overflow;
 
-    if (soonModalOpen) {
-      document.body.style.overflow = 'hidden';
+    if (soonModalOpen || showPricingModal) {
+      document.body.style.overflow = "hidden";
     }
 
-    document.addEventListener('mousedown', handleClickOutside);
-    document.addEventListener('keydown', handleEscape);
+    document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener("keydown", handleEscape);
 
     return () => {
       document.body.style.overflow = previousOverflow;
-      document.removeEventListener('mousedown', handleClickOutside);
-      document.removeEventListener('keydown', handleEscape);
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("keydown", handleEscape);
     };
-  }, [soonModalOpen]);
+  }, [soonModalOpen, showPricingModal]);
 
   const handleProfileClick = () => {
     setProfileModalOpen(true);
     setUserMenuOpen(false);
   };
 
-  const handleToolsHubClick = () => {
-    navigate("/ferramentas");
+  const handleOpenSoonModal = (title: string) => {
+    setSoonModalTitle(title);
+    setSoonModalOpen(true);
+    setHamburgerMenuOpen(false);
+  };
+
+  const openPricingModal = () => {
+    setShowPricingModal(true);
+    setHamburgerMenuOpen(false);
+  };
+
+  const handleRadarPageClick = () => {
+    navigate("/radarpage");
     window.scrollTo(0, 0);
     setHamburgerMenuOpen(false);
   };
 
-  const handleOpenSoonModal = (title: string) => {
-    setSoonModalTitle(title);
-    setSoonModalOpen(true);
+  const handleSwipeMaxClick = () => {
+    navigate("/swipe-max");
+    window.scrollTo(0, 0);
     setHamburgerMenuOpen(false);
   };
 
@@ -277,23 +278,55 @@ const GlobalHeader = ({
               )}
 
               {hamburgerMenuOpen && (
-                <div className="absolute left-0 top-[calc(100%+12px)] z-[80] w-[340px] overflow-hidden rounded-[28px] border border-white/10 bg-[rgba(7,10,22,0.97)] shadow-[0_30px_90px_rgba(0,0,0,0.60)] backdrop-blur-[34px]">
+                <div className="absolute left-0 top-[calc(100%+12px)] z-[80] w-[360px] overflow-hidden rounded-[28px] border border-white/10 bg-[rgba(7,10,22,0.97)] shadow-[0_30px_90px_rgba(0,0,0,0.60)] backdrop-blur-[34px]">
                   <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(255,70,70,0.09),transparent_30%),radial-gradient(circle_at_bottom_right,rgba(59,130,246,0.12),transparent_35%)]" />
 
                   <div className="relative border-b border-white/10 px-5 py-4">
                     <div className="mb-1 flex items-center gap-2">
                       <Sparkles size={15} className="text-[#ff4b4b]" />
                       <p className="text-[15px] font-semibold text-white">
-                        Ferramentas Premium
+                        Menu Premium
                       </p>
                     </div>
 
-                    <p className="text-sm leading-6 text-zinc-400">
-                      Acesse páginas e builders prontos para editar.
-                    </p>
+                    <p className="text-sm leading-6 text-zinc-400"></p>
                   </div>
 
                   <div className="relative p-2">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (!loadingPlan && !isAnnual) {
+                          openPricingModal();
+                          return;
+                        }
+
+                        handleRadarPageClick();
+                      }}
+                      className="group mb-2 flex w-full items-center justify-between rounded-[24px] border border-red-500/20 bg-[linear-gradient(180deg,rgba(239,68,68,0.14)_0%,rgba(127,29,29,0.12)_100%)] px-4 py-4 text-left shadow-[0_12px_32px_rgba(127,29,29,0.16)] transition-all duration-200 hover:-translate-y-0.5 hover:border-red-500/35 hover:bg-[linear-gradient(180deg,rgba(239,68,68,0.18)_0%,rgba(127,29,29,0.16)_100%)]"
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className="flex h-11 w-11 items-center justify-center rounded-[16px] border border-red-500/20 bg-red-500/10 text-red-300">
+                          <Sparkles size={18} />
+                        </div>
+
+                        <div>
+                          <p className="text-sm font-semibold text-white">
+                            RadarPage
+                          </p>
+                          <p className="text-xs text-zinc-400">
+                            Páginas reais rodando agora
+                          </p>
+                        </div>
+                      </div>
+
+                      {!loadingPlan && !isAnnual ? (
+                        <Lock size={16} className="text-zinc-500" />
+                      ) : (
+                        <ArrowRight className="h-4 w-4 text-red-200 transition-transform duration-200 group-hover:translate-x-0.5" />
+                      )}
+                    </button>
+
                     <button
                       type="button"
                       onClick={() => handleOpenSoonModal("Página Advertorial")}
@@ -307,9 +340,7 @@ const GlobalHeader = ({
                           <p className="text-sm font-medium text-white">
                             Página Advertorial
                           </p>
-                          <p className="text-xs text-zinc-500">
-                            Em Breve
-                          </p>
+                          <p className="text-xs text-zinc-500">Em breve</p>
                         </div>
                       </div>
 
@@ -331,9 +362,7 @@ const GlobalHeader = ({
                           <p className="text-sm font-medium text-white">
                             VSL Builder
                           </p>
-                          <p className="text-xs text-zinc-500">
-                            Em Breve
-                          </p>
+                          <p className="text-xs text-zinc-500">Em breve</p>
                         </div>
                       </div>
 
@@ -355,9 +384,7 @@ const GlobalHeader = ({
                           <p className="text-sm font-medium text-white">
                             DTC Builder
                           </p>
-                          <p className="text-xs text-zinc-500">
-                            Em Breve
-                          </p>
+                          <p className="text-xs text-zinc-500">Em breve</p>
                         </div>
                       </div>
 
@@ -428,7 +455,9 @@ const GlobalHeader = ({
                     <p className="truncate text-[16px] font-semibold text-white">
                       {displayName}
                     </p>
-                    <p className="truncate text-sm text-zinc-400">{trimmedEmail}</p>
+                    <p className="truncate text-sm text-zinc-400">
+                      {trimmedEmail}
+                    </p>
                   </div>
 
                   <div className="relative border-b border-white/10 px-5 py-4">
@@ -442,7 +471,7 @@ const GlobalHeader = ({
                           Seu plano
                         </p>
                         <p className="truncate text-[17px] font-semibold text-white">
-                          {loadingPlan ? 'Carregando...' : formattedPlan}
+                          {loadingPlan ? "Carregando..." : formattedPlan}
                         </p>
                       </div>
                     </div>
@@ -452,7 +481,11 @@ const GlobalHeader = ({
                     <button
                       type="button"
                       onClick={() =>
-                        window.open("https://wa.me/551153042433", "_blank", "noopener,noreferrer")
+                        window.open(
+                          "https://wa.me/551153042433",
+                          "_blank",
+                          "noopener,noreferrer"
+                        )
                       }
                       className="flex w-full items-center justify-between rounded-[22px] px-4 py-4 text-left text-white transition-all duration-200 hover:bg-green-500/10 hover:text-green-400"
                     >
@@ -463,7 +496,7 @@ const GlobalHeader = ({
                             viewBox="0 0 32 32"
                             className="h-5 w-5 fill-green-400"
                           >
-                            <path d="M16 .396C7.163.396 0 7.56 0 16.396c0 2.885.754 5.593 2.07 7.94L.16 31.64l7.528-1.878a15.94 15.94 0 0 0 8.312 2.285c8.837 0 16-7.164 16-16S24.837.396 16 .396zm0 29.29c-2.52 0-4.873-.684-6.9-1.874l-.493-.29-4.466 1.114 1.19-4.356-.32-.507A13.79 13.79 0 0 1 2.2 16.396c0-7.61 6.19-13.8 13.8-13.8s13.8 6.19 13.8 13.8-6.19 13.8-13.8 13.8zm7.63-10.36c-.417-.208-2.466-1.216-2.848-1.354-.38-.14-.658-.208-.935.208-.277.417-1.073 1.354-1.317 1.633-.243.277-.486.312-.903.104-.417-.208-1.762-.65-3.357-2.072-1.24-1.105-2.078-2.47-2.322-2.887-.243-.417-.026-.643.183-.85.188-.187.417-.486.625-.73.208-.243.277-.417.417-.695.14-.277.07-.52-.035-.73-.104-.208-.935-2.255-1.28-3.09-.336-.806-.678-.697-.935-.71l-.797-.014c-.277 0-.73.104-1.11.52-.38.417-1.456 1.423-1.456 3.466s1.49 4.02 1.698 4.297c.208.277 2.933 4.477 7.104 6.278.994.43 1.77.686 2.375.878.997.317 1.905.272 2.623.165.8-.12 2.466-1.008 2.814-1.982.347-.973.347-1.806.243-1.982-.104-.174-.38-.277-.797-.486z"/>
+                            <path d="M16 .396C7.163.396 0 7.56 0 16.396c0 2.885.754 5.593 2.07 7.94L.16 31.64l7.528-1.878a15.94 15.94 0 0 0 8.312 2.285c8.837 0 16-7.164 16-16S24.837.396 16 .396zm0 29.29c-2.52 0-4.873-.684-6.9-1.874l-.493-.29-4.466 1.114 1.19-4.356-.32-.507A13.79 13.79 0 0 1 2.2 16.396c0-7.61 6.19-13.8 13.8-13.8s13.8 6.19 13.8 13.8-6.19 13.8-13.8 13.8zm7.63-10.36c-.417-.208-2.466-1.216-2.848-1.354-.38-.14-.658-.208-.935.208-.277.417-1.073 1.354-1.317 1.633-.243.277-.486.312-.903.104-.417-.208-1.762-.65-3.357-2.072-1.24-1.105-2.078-2.47-2.322-2.887-.243-.417-.026-.643.183-.85.188-.187.417-.486.625-.73.208-.243.277-.417.417-.695.14-.277.07-.52-.035-.73-.104-.208-.935-2.255-1.28-3.09-.336-.806-.678-.697-.935-.71l-.797-.014c-.277 0-.73.104-1.11.52-.38.417-1.456 1.423-1.456 3.466s1.49 4.02 1.698 4.297c.208.277 2.933 4.477 7.104 6.278.994.43 1.77.686 2.375.878.997.317 1.905.272 2.623.165.8-.12 2.466-1.008 2.814-1.982.347-.973.347-1.806.243-1.982-.104-.174-.38-.277-.797-.486z" />
                           </svg>
                         </div>
 
@@ -509,6 +542,10 @@ const GlobalHeader = ({
           plan={formattedPlan}
         />
       </header>
+
+      {showPricingModal && (
+        <SwipeMaxPricingModal onClose={() => setShowPricingModal(false)} />
+      )}
 
       {soonModalOpen && (
         <div className="fixed inset-0 z-[120] flex items-center justify-center p-4">

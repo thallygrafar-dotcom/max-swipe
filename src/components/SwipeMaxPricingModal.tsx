@@ -33,12 +33,11 @@ export default function SwipeMaxPricingModal({
           </div>
 
           <h3 className="mt-4 pr-12 text-[30px] font-semibold leading-[1.02] tracking-[-0.05em] text-white">
-            Libere o plano anual
+            Libere o Plano Anual
           </h3>
 
           <p className="mt-3 text-[15px] leading-7 text-zinc-400">
-            Tenha acesso à página de Ferramentas Premium, com Advertorial,
-            DTC Builder, VSL Builder e à Estrutura Invisível de cada VSL.
+            Desbloqueie o RadarPage, os Builders Premium e a Estrutura Invisível que revela como cada VSL foi construída.
           </p>
 
           <div className="mt-6 rounded-[24px] border border-red-500/20 bg-red-500/[0.07] p-5">
@@ -49,26 +48,26 @@ export default function SwipeMaxPricingModal({
               </span>
             </div>
             <p className="mt-2 text-sm text-zinc-300">
-              Acesso anual ao SwipeMAX + Ferramentas Premium.
+              Acesso anual ao SwipeMAX + RadarPage + Ferramentas Premium.
             </p>
           </div>
 
           <div className="mt-5 space-y-3 text-sm text-zinc-300">
             <div className="flex items-center gap-3">
               <Check className="h-4 w-4 text-emerald-300" />
-              Página de Ferramentas Premium
+              Estrutura Invisível da VSL
             </div>
             <div className="flex items-center gap-3">
               <Check className="h-4 w-4 text-emerald-300" />
-              DTC Builder liberado
+              Ferramentas Premium
             </div>
             <div className="flex items-center gap-3">
               <Check className="h-4 w-4 text-emerald-300" />
-              VSL Builder liberado
+              RadarPage
             </div>
             <div className="flex items-center gap-3">
               <Check className="h-4 w-4 text-emerald-300" />
-              Estrutura Invisível nas VSLs
+              Ofertas CPA de Elite ($180+)
             </div>
           </div>
 
