@@ -193,8 +193,8 @@ export default function RadarPage() {
           <SwipeHeader />
         </div>
 
-        <div className="relative z-10 mx-auto w-full max-w-[1920px] px-4 pb-10 pt-24 md:px-6 md:pb-12 md:pt-28">
-          <div className="flex flex-col gap-6">
+<div className="relative z-10 mx-auto w-full max-w-[1432px] px-4 pb-10 pt-24 md:px-6 md:pb-12 md:pt-28">
+    <div className="flex flex-col gap-6">
             <section
               className="
                 relative overflow-hidden rounded-[30px]
@@ -216,8 +216,7 @@ export default function RadarPage() {
 </h1>
 
                 <p className="mt-3 max-w-[760px] text-[14px] leading-7 text-zinc-400 md:text-[15px]">
-                  Veja páginas que estão no ar agora sendo anunciadas, com estrutura, copy e construção prontas para análise e inspiração.
-                </p>
+Veja exemplos de páginas bem estruturadas, com copy e construção organizadas para análise e inspiração.                </p>
               </div>
             </section>
 
