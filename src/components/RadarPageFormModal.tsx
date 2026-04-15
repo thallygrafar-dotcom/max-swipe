@@ -107,8 +107,8 @@ export default function RadarPageFormModal({
     try {
       setUploading((prev) => ({ ...prev, preview: true }));
 
-      const filePath = buildFilePath("preview-images", file.name);
-      await uploadToBucket("radarpage-images", filePath, file);
+      const filePath = `${Date.now()}-${sanitizeFileName(file.name)}`;
+await uploadToBucket("radarpage-previews", filePath, file);
 
       setForm((prev) => ({
         ...prev,

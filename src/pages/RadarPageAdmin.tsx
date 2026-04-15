@@ -216,21 +216,17 @@ export default function RadarPageAdmin() {
   }
 
   async function handleDelete(id: number) {
-
     const {
-  data: { user },
-} = await supabase.auth.getUser();
+      data: { user },
+    } = await supabase.auth.getUser();
 
-console.log("SUPABASE USER DELETE:", user);
+    console.log("SUPABASE USER DELETE:", user);
 
     const confirmed = window.confirm("Deseja excluir esta página do Radar?");
     if (!confirmed) return;
 
     try {
-      const { error } = await supabase
-        .from("radar_page_items")
-        .delete()
-        .eq("id", id);
+      const { error } = await supabase.from("radar_page_items").delete().eq("id", id);
 
       if (error) {
         console.error("Erro ao excluir página:", error);
@@ -247,12 +243,12 @@ console.log("SUPABASE USER DELETE:", user);
 
   async function togglePublished(id: number, currentValue: boolean) {
     try {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
 
-        const {
-  data: { user },
-} = await supabase.auth.getUser();
+      console.log("SUPABASE USER UPDATE:", user);
 
-console.log("SUPABASE USER UPDATE:", user);
       const { error } = await supabase
         .from("radar_page_items")
         .update({ published: !currentValue })
@@ -276,12 +272,18 @@ console.log("SUPABASE USER UPDATE:", user);
   }
 
   async function handleSave() {
+    let imageUrl = form.imageUrl.trim();
+
+    if (!imageUrl.startsWith("http")) {
+      imageUrl = `https://ppbcrkvuxbfqapseocvp.supabase.co/storage/v1/object/public/radarpage-previews/${imageUrl}`;
+    }
+
     const payload = {
       title: form.title.trim(),
       niche: form.niche.trim(),
       page_style: form.pageStyle,
       tags: form.tags.trim(),
-      image_url: form.imageUrl.trim(),
+      image_url: imageUrl,
       image_white_url: form.imageWhiteUrl.trim(),
       image_black_url: form.imageBlackUrl.trim(),
       published: form.published,
@@ -325,9 +327,7 @@ console.log("SUPABASE USER UPDATE:", user);
           return;
         }
       } else {
-        const { error } = await supabase
-          .from("radar_page_items")
-          .insert([payload]);
+        const { error } = await supabase.from("radar_page_items").insert([payload]);
 
         if (error) {
           console.error("Erro ao cadastrar página:", error);
@@ -496,10 +496,10 @@ console.log("SUPABASE USER UPDATE:", user);
                   <div className="flex min-w-0 flex-1 items-start gap-4">
                     <div className="h-20 w-20 shrink-0 overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03]">
                       {item.imageUrl ? (
-                        <StorageImage
-                          bucket="radarpage-images"
-                          path={item.imageUrl}
+                        <img
+                          src={item.imageUrl}
                           alt={item.title}
+                          className="h-full w-full object-cover"
                         />
                       ) : (
                         <div className="flex h-full w-full items-center justify-center text-zinc-500">

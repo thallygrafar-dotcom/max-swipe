@@ -338,18 +338,18 @@ export default function RadarPage() {
                       <div className="relative z-10">
                         <div className="relative h-[250px] overflow-hidden">
                           {item.imageUrl ? (
-                            <StorageImage
-                              bucket="radarpage-images"
-                              path={item.imageUrl}
-                              alt={item.title}
-                            />
-                          ) : item.imageWhiteUrl || item.imageBlackUrl ? (
-                            <StorageImage
-                              bucket="radarpage-images"
-                              path={item.imageWhiteUrl || item.imageBlackUrl}
-                              alt={item.title}
-                            />
-                          ) : (
+  <img
+    src={item.imageUrl}
+    alt={item.title}
+    className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.04]"
+  />
+) : item.imageWhiteUrl || item.imageBlackUrl ? (
+  <img
+    src={item.imageWhiteUrl || item.imageBlackUrl}
+    alt={item.title}
+    className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.04]"
+  />
+) : (
                             <div className="flex h-full w-full items-center justify-center bg-white/[0.03] text-zinc-500">
                               <ImageIcon className="h-8 w-8" />
                             </div>
