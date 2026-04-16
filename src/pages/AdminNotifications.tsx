@@ -114,7 +114,7 @@ const AdminNotifications = () => {
 
     const { error } = await sb
       .from("notifications")
-      .update({ is_active: !notification.is_active })
+      .update({ is_active: notification.is_active ? false : true })
       .eq("id", notification.id);
 
     if (error) {
