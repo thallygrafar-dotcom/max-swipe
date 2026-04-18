@@ -482,6 +482,14 @@ export default function SwipeMax() {
       `}</style>
 
       <div className="min-h-screen overflow-x-hidden bg-[#0c0c10] text-white">
+        {loading && (
+  <div className="fixed inset-0 z-[200] flex items-center justify-center bg-[#0c0c10]/80 backdrop-blur-sm">
+    <div className="flex flex-col items-center gap-3">
+      <div className="h-8 w-8 animate-spin rounded-full border-2 border-white/30 border-t-white" />
+      <p className="text-sm font-medium text-white">Carregando...</p>
+    </div>
+  </div>
+)}
         <div className="pointer-events-none fixed inset-0 bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.06),transparent_24%),radial-gradient(circle_at_top_right,rgba(239,68,68,0.10),transparent_20%),radial-gradient(circle_at_bottom_left,rgba(59,130,246,0.06),transparent_22%)]" />
         <div className="pointer-events-none fixed inset-x-0 top-0 h-[380px] bg-[linear-gradient(180deg,rgba(255,255,255,0.03)_0%,rgba(255,255,255,0)_100%)]" />
 
@@ -636,11 +644,7 @@ export default function SwipeMax() {
             </section>
 
             <section>
-              {loading ? (
-                <div className="rounded-[30px] border border-white/10 bg-[linear-gradient(180deg,rgba(20,20,26,0.94)_0%,rgba(12,12,16,0.94)_100%)] px-6 py-14 text-center shadow-[0_18px_40px_rgba(0,0,0,0.18)]">
-                  <p className="text-lg font-medium text-white">Carregando...</p>
-                </div>
-              ) : filteredOffers.length === 0 ? (
+              {filteredOffers.length === 0 ? (
                 <div className="rounded-[30px] border border-white/10 bg-[linear-gradient(180deg,rgba(20,20,26,0.94)_0%,rgba(12,12,16,0.94)_100%)] px-6 py-14 text-center shadow-[0_18px_40px_rgba(0,0,0,0.18)]">
                   <p className="text-lg font-medium text-white">
                     Nenhuma oferta publicada
@@ -667,6 +671,8 @@ export default function SwipeMax() {
                     const isDownloadedTranscription =
                       downloadState.key === transcriptionKey &&
                       downloadState.status === "done";
+                    
+                    
 
                     return (
                       <article

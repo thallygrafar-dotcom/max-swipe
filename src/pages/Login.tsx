@@ -112,7 +112,7 @@ export default function Login() {
     }
 
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${window.location.origin}/reset-password`,
+      redirectTo: 'https://www.swipemax.com.br/reset-password',
     });
 
     if (error) {

@@ -32,7 +32,7 @@ const ProfileModal = ({ open, onClose, user, plan }: ProfileModalProps) => {
     }
 
     const { error } = await supabase.auth.resetPasswordForEmail(user.email, {
-      redirectTo: `${window.location.origin}/reset-password`,
+      redirectTo: 'https://www.swipemax.com.br/reset-password',
     });
 
     if (error) {

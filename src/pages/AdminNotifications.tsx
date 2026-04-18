@@ -111,10 +111,11 @@ const AdminNotifications = () => {
 
   const handleToggleActive = async (notification: AdminNotification) => {
     const sb = supabase as any;
+    const nextIsActive = notification.is_active === true ? false : true;
 
     const { error } = await sb
       .from("notifications")
-      .update({ is_active: notification.is_active ? false : true })
+      .update({ is_active: nextIsActive })
       .eq("id", notification.id);
 
     if (error) {
@@ -123,13 +124,7 @@ const AdminNotifications = () => {
       return;
     }
 
-    setNotifications((prev) =>
-      prev.map((item) =>
-        item.id === notification.id
-          ? { ...item, is_active: !notification.is_active }
-          : item
-      )
-    );
+    await fetchNotifications();
   };
 
   const handleDeleteForever = async (notification: AdminNotification) => {
