@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import HeaderEditor from "./sections/HeaderEditor";
 import HeroEditor from "./sections/HeroEditor";
@@ -8,6 +8,7 @@ import CommentsEditor from "./sections/CommentsEditor";
 import SidebarEditor from "./sections/SidebarEditor";
 import FooterEditor from "./sections/FooterEditor";
 import ExportEditor from "./sections/ExportEditor";
+import ScriptsEditor from "./sections/ScriptsEditor";
 import {
   LayoutTemplate,
   Image,
@@ -26,8 +27,21 @@ const EditorTabs = () => {
     | "comments"
     | "sidebar"
     | "footer"
+    | "scripts"
     | "export"
   >("header");
+
+  const scrollAreaRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    const viewport = scrollAreaRef.current?.querySelector(
+      "[data-radix-scroll-area-viewport]"
+    ) as HTMLDivElement | null;
+
+    if (viewport) {
+      viewport.scrollTo({ top: 0, behavior: "auto" });
+    }
+  }, [activeTab]);
 
   return (
     <div className="flex h-full min-h-0">
@@ -108,6 +122,17 @@ const EditorTabs = () => {
             }`}
           >
             <PanelBottom className="w-5 h-5" />
+          </button>
+
+          <button
+            onClick={() => setActiveTab("scripts")}
+            className={`w-10 h-10 rounded-lg flex items-center justify-center mx-auto ${
+              activeTab === "scripts"
+                ? "bg-primary text-white"
+                : "text-muted-foreground hover:bg-muted"
+            }`}
+          >
+            <FileText className="w-5 h-5" />
           </button>
 
           <button
@@ -195,18 +220,28 @@ const EditorTabs = () => {
             </div>
           )}
 
+          {activeTab === "scripts" && (
+            <div className="flex items-center gap-2">
+              <FileText className="w-4 h-4 text-primary" />
+              <span className="font-semibold text-sm">Scripts</span>
+              <span className="text-muted-foreground text-xs">
+                — Tracking e códigos
+              </span>
+            </div>
+          )}
+
           {activeTab === "export" && (
             <div className="flex items-center gap-2">
               <Download className="w-4 h-4 text-primary" />
-              <span className="font-semibold text-sm">Export</span>
+              <span className="font-semibold text-sm">Projetos</span>
               <span className="text-muted-foreground text-xs">
-                — Baixar ZIP do advertorial
+                — Abrir e gerenciar projetos salvos
               </span>
             </div>
           )}
         </div>
 
-        <ScrollArea className="flex-1">
+        <ScrollArea ref={scrollAreaRef} className="flex-1">
           <div className="p-4">
             {activeTab === "header" && <HeaderEditor />}
             {activeTab === "hero" && <HeroEditor />}
@@ -215,6 +250,7 @@ const EditorTabs = () => {
             {activeTab === "comments" && <CommentsEditor />}
             {activeTab === "sidebar" && <SidebarEditor />}
             {activeTab === "footer" && <FooterEditor />}
+            {activeTab === "scripts" && <ScriptsEditor />}
             {activeTab === "export" && <ExportEditor />}
           </div>
         </ScrollArea>

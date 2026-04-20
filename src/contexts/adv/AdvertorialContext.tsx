@@ -33,7 +33,14 @@ export interface CommentItem {
 export interface AdvertorialConfig {
   siteName: string;
   domain: string;
-  headScripts: string;
+
+  scripts: {
+    clarityEnabled: boolean;
+    clarityProjectId: string;
+    headScripts: string;
+    bodyStartScripts: string;
+    bodyEndScripts: string;
+  };
 
   warningBox1Color: string;
   warningBox2Color: string;
@@ -111,9 +118,11 @@ export interface AdvertorialConfig {
 
 interface AdvertorialContextType {
   config: AdvertorialConfig;
+  currentProjectId: string | null;
   updateConfig: (updates: Partial<AdvertorialConfig>) => void;
   resetConfig: () => void;
   setFullConfig: (newConfig: AdvertorialConfig) => void;
+  setCurrentProjectId: (id: string | null) => void;
 }
 
 export const emptyImage = (): AdvertorialImage => ({
@@ -129,7 +138,14 @@ export const uid = () => Math.random().toString(36).slice(2, 10);
 export const defaultAdvertorialConfig: AdvertorialConfig = {
   siteName: "Vision Eye Health",
   domain: "https://visioneyehealth.com",
-  headScripts: "",
+
+  scripts: {
+    clarityEnabled: false,
+    clarityProjectId: "",
+    headScripts: "",
+    bodyStartScripts: "",
+    bodyEndScripts: "",
+  },
 
   brandName: "Vision Eye Health",
   brandSubtext: "Eye Health",
@@ -299,6 +315,7 @@ export const AdvertorialProvider = ({
   const [config, setConfig] = useState<AdvertorialConfig>(
     defaultAdvertorialConfig
   );
+  const [currentProjectId, setCurrentProjectId] = useState<string | null>(null);
 
   const updateConfig = (updates: Partial<AdvertorialConfig>) => {
     setConfig((prev) => ({ ...prev, ...updates }));
@@ -306,6 +323,7 @@ export const AdvertorialProvider = ({
 
   const resetConfig = () => {
     setConfig(defaultAdvertorialConfig);
+    setCurrentProjectId(null);
   };
 
   const setFullConfig = (newConfig: AdvertorialConfig) => {
@@ -315,11 +333,13 @@ export const AdvertorialProvider = ({
   const value = useMemo(
     () => ({
       config,
+      currentProjectId,
       updateConfig,
       resetConfig,
       setFullConfig,
+      setCurrentProjectId,
     }),
-    [config]
+    [config, currentProjectId]
   );
 
   return (

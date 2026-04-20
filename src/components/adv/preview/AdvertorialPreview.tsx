@@ -32,7 +32,7 @@ const AdvertorialPreview = ({
         previewMode === "mobile" ? "max-w-[390px]" : "max-w-[1080px]"
       }`}
     >
-      <div className="overflow-hidden rounded-xl border border-[#dcdfe5] bg-[#f7f7f7] shadow-[0_8px_28px_rgba(15,23,42,0.06)]">
+      <div className="rounded-xl border border-[#dcdfe5] bg-[#f7f7f7] shadow-[0_8px_28px_rgba(15,23,42,0.06)]">
         <div
           className="flex items-center justify-between px-5 py-4"
           style={{
@@ -82,7 +82,7 @@ const AdvertorialPreview = ({
         </div>
 
         <div
-          className={`grid gap-6 p-5 ${
+          className={`grid items-start gap-6 p-5 ${
             previewMode === "mobile"
               ? "grid-cols-1"
               : "grid-cols-1 lg:grid-cols-[minmax(0,1fr)_290px]"
@@ -365,94 +365,96 @@ const AdvertorialPreview = ({
           </div>
 
           {previewMode === "desktop" && (
-            <div className="space-y-5">
-              <div className="rounded-lg border border-[#e3e4e8] bg-white p-5 shadow-[0_2px_10px_rgba(15,23,42,0.03)]">
-                <h3 className="text-[20px] font-bold text-[#2f2f2f]">
-                  {config.featuredTitle}
-                </h3>
+            <div className="self-start">
+              <div className="sticky top-5 space-y-5">
+                <div className="rounded-lg border border-[#e3e4e8] bg-white p-5 shadow-[0_2px_10px_rgba(15,23,42,0.03)]">
+                  <h3 className="text-[20px] font-bold text-[#2f2f2f]">
+                    {config.featuredTitle}
+                  </h3>
 
-                <ul className="mt-4 space-y-4 text-[15px] leading-6 text-[#505050]">
-                  {config.featuredArticles.map((item, index) => (
-                    <li key={index}>
-                      <a href={item.url || "#"} className="hover:underline">
-                        + {item.label}
+                  <ul className="mt-4 space-y-4 text-[15px] leading-6 text-[#505050]">
+                    {config.featuredArticles.map((item, index) => (
+                      <li key={index}>
+                        <a href={item.url || "#"} className="hover:underline">
+                          + {item.label}
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+                <div className="rounded-lg border border-[#e3e4e8] bg-white p-5 shadow-[0_2px_10px_rgba(15,23,42,0.03)]">
+                  <h3 className="text-[20px] font-bold text-[#2f2f2f]">
+                    {config.relatedTitle}
+                  </h3>
+
+                  <div className="mt-4 space-y-4">
+                    {config.relatedArticles.map((item, index) => (
+                      <a
+                        key={index}
+                        href={item.url || "#"}
+                        className="block hover:opacity-90"
+                      >
+                        <p className="text-[15px] font-semibold leading-6 text-[#313131]">
+                          {item.title}
+                        </p>
+                        <p className="mt-1 text-[12px] text-[#8b8b8b]">
+                          {item.meta}
+                        </p>
                       </a>
-                    </li>
-                  ))}
-                </ul>
-              </div>
+                    ))}
+                  </div>
+                </div>
 
-              <div className="rounded-lg border border-[#e3e4e8] bg-white p-5 shadow-[0_2px_10px_rgba(15,23,42,0.03)]">
-                <h3 className="text-[20px] font-bold text-[#2f2f2f]">
-                  {config.relatedTitle}
-                </h3>
+                <div
+                  className="overflow-hidden rounded-xl shadow-[0_8px_22px_rgba(21,33,95,0.16)]"
+                  style={{ backgroundColor: config.sidebarBgColor }}
+                >
+                  <div className="overflow-hidden flex h-[180px] items-center justify-center text-center text-sm">
+                    {sidebarSrc ? (
+                      <img
+                        src={sidebarSrc}
+                        alt="Sidebar"
+                        className="block h-full w-full object-cover"
+                      />
+                    ) : (
+                      <div
+                        className="flex flex-col items-center gap-2"
+                        style={{ color: config.sidebarTextColor + "B3" }}
+                      >
+                        <ImageIcon className="h-6 w-6" />
+                        Imagem CTA lateral
+                      </div>
+                    )}
+                  </div>
 
-                <div className="mt-4 space-y-4">
-                  {config.relatedArticles.map((item, index) => (
+                  <div className="px-5 py-6 text-center">
+                    <p
+                      className="text-[26px] font-bold leading-tight"
+                      style={{ color: config.sidebarTextColor }}
+                    >
+                      {config.sidebarCtaTitle}
+                    </p>
+
+                    <p
+                      className="mt-3 text-[14px] leading-6"
+                      style={{ color: config.sidebarTextColor + "CC" }}
+                    >
+                      {config.sidebarCtaText}
+                    </p>
+
                     <a
-                      key={index}
-                      href={item.url || "#"}
-                      className="block hover:opacity-90"
+                      href={config.sidebarCtaButtonUrl || "#"}
+                      className="mt-5 inline-flex rounded-full px-5 py-3 text-[14px] font-semibold transition-all duration-200 hover:-translate-y-[1px]"
+                      style={{
+                        backgroundColor: config.sidebarButtonColor,
+                        color: config.sidebarButtonTextColor,
+                        boxShadow: `0 8px 20px ${config.sidebarButtonColor}33`,
+                      }}
                     >
-                      <p className="text-[15px] font-semibold leading-6 text-[#313131]">
-                        {item.title}
-                      </p>
-                      <p className="mt-1 text-[12px] text-[#8b8b8b]">
-                        {item.meta}
-                      </p>
+                      ▶ {config.sidebarCtaButton}
                     </a>
-                  ))}
-                </div>
-              </div>
-
-              <div
-                className="overflow-hidden rounded-xl shadow-[0_8px_22px_rgba(21,33,95,0.16)]"
-                style={{ backgroundColor: config.sidebarBgColor }}
-              >
-                <div className="overflow-hidden flex h-[180px] items-center justify-center text-center text-sm">
-                  {sidebarSrc ? (
-                    <img
-                      src={sidebarSrc}
-                      alt="Sidebar"
-                      className="block h-full w-full object-cover"
-                    />
-                  ) : (
-                    <div
-                      className="flex flex-col items-center gap-2"
-                      style={{ color: config.sidebarTextColor + "B3" }}
-                    >
-                      <ImageIcon className="h-6 w-6" />
-                      Imagem CTA lateral
-                    </div>
-                  )}
-                </div>
-
-                <div className="px-5 py-6 text-center">
-                  <p
-                    className="text-[26px] font-bold leading-tight"
-                    style={{ color: config.sidebarTextColor }}
-                  >
-                    {config.sidebarCtaTitle}
-                  </p>
-
-                  <p
-                    className="mt-3 text-[14px] leading-6"
-                    style={{ color: config.sidebarTextColor + "CC" }}
-                  >
-                    {config.sidebarCtaText}
-                  </p>
-
-                  <a
-                    href={config.sidebarCtaButtonUrl || "#"}
-                    className="mt-5 inline-flex rounded-full px-5 py-3 text-[14px] font-semibold transition-all duration-200 hover:-translate-y-[1px]"
-                    style={{
-                      backgroundColor: config.sidebarButtonColor,
-                      color: config.sidebarButtonTextColor,
-                      boxShadow: `0 8px 20px ${config.sidebarButtonColor}33`,
-                    }}
-                  >
-                    ▶ {config.sidebarCtaButton}
-                  </a>
+                  </div>
                 </div>
               </div>
             </div>
