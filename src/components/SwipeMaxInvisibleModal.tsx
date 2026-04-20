@@ -60,7 +60,7 @@ function ArrayValue({ items }: { items: any[] }) {
 
   if (allPrimitive) {
     return (
-      <ul className="space-y-2">
+      <ul className="space-y-2 m-0">
         {items.map((item, index) => (
           <li
             key={`${String(item)}-${index}`}
@@ -135,7 +135,7 @@ function SectionCard({
   value: any;
 }) {
   return (
-    <div className="rounded-[22px] border border-white/10 bg-white/[0.03] p-4">
+    <div className="flex h-full flex-col rounded-[22px] border border-white/10 bg-white/[0.03] p-4">
       <p className="mb-2 text-[11px] font-semibold uppercase tracking-[0.16em] text-zinc-500">
         {title}
       </p>
@@ -316,17 +316,18 @@ export default function SwipeMaxInvisibleModal({ vslId, onClose }: Props) {
         }
 
         .item-card {
-          background:
-            linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02)),
-            radial-gradient(circle at top left, rgba(248,113,113,0.08), transparent 35%);
-          border: 1px solid rgba(255,255,255,0.10);
-          border-radius: 20px;
-          padding: 18px 20px;
-          box-shadow:
-            inset 0 1px 0 rgba(255,255,255,0.04),
-            0 10px 30px rgba(0,0,0,0.18);
-          margin-bottom: 14px;
-        }
+  background:
+    linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02)),
+    radial-gradient(circle at top left, rgba(248,113,113,0.08), transparent 35%);
+  border: 1px solid rgba(255,255,255,0.10);
+  border-radius: 20px;
+  padding: 18px 20px;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.04),
+    0 10px 30px rgba(0,0,0,0.18);
+  margin-bottom: 0;
+  height: 100%;
+}
 
         .item-card:last-child {
           margin-bottom: 0;
@@ -612,15 +613,24 @@ export default function SwipeMaxInvisibleModal({ vslId, onClose }: Props) {
                   {currentTabData ? (
                     typeof currentTabData === "object" &&
                     !Array.isArray(currentTabData) ? (
-                      <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
-                        {Object.entries(currentTabData).map(([key, value]) => (
-                          <SectionCard
-                            key={key}
-                            title={prettifyKey(key)}
-                            value={value}
-                          />
-                        ))}
-                      </div>
+                      <div className="space-y-4">
+  {Object.entries(currentTabData)
+    .reduce((acc, curr, i, arr) => {
+      if (i % 2 === 0) acc.push(arr.slice(i, i + 2));
+      return acc;
+    }, [] as [string, any][][])
+    .map((pair, index) => (
+      <div key={index} className="grid grid-cols-1 xl:grid-cols-2 gap-4">
+  {pair.map(([key, value]) => (
+    <SectionCard
+      key={key}
+      title={prettifyKey(key)}
+      value={value}
+    />
+  ))}
+</div>
+    ))}
+</div>
                     ) : (
                       <div
                         className="rounded-[22px] border border-white/10 bg-white/[0.03] p-5"
