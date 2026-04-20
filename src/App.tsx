@@ -15,6 +15,8 @@ import AdminNotifications from "@/pages/AdminNotifications";
 import HomeLanding from "./pages/HomeLanding";
 import RadarPageAdmin from "@/pages/RadarPageAdmin";
 import RadarPage from "@/pages/RadarPage";
+import AdminVslAnalysis from "./pages/AdminVslAnalysis";
+import MaxLab from "./pages/MaxLab";
 
 function LoadingScreen() {
   return (
@@ -95,6 +97,17 @@ function AppRoutes() {
       <Route path="/radar-admin" element={<RadarPageAdmin />} />
 
       <Route path="/radarpage" element={<RadarPage />} />
+
+      <Route path="/maxlab" element={<MaxLab />} />
+
+      <Route
+  path="/admin-vsl-analysis"
+  element={
+    <ProtectedRoute>
+      <AdminVslAnalysis />
+    </ProtectedRoute>
+  }
+/>
 
       <Route
         path="/admin-users"

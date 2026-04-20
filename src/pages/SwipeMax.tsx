@@ -81,6 +81,7 @@ const niches = [
   "Pulmão",
   "Disfunção Erétil",
   "Memória",
+  "Zumbido",
 ];
 
 const formats = ["Todos"];
@@ -200,7 +201,7 @@ export default function SwipeMax() {
   const [selectedStatus, setSelectedStatus] = useState("Todos");
   const [sortBy, setSortBy] = useState("recent");
   const [showPricingModal, setShowPricingModal] = useState(false);
-  const [showInvisibleModal, setShowInvisibleModal] = useState(false);
+  const [selectedInvisibleVslId, setSelectedInvisibleVslId] = useState<number | null>(null);
   const [showSoonModal, setShowSoonModal] = useState(false);
   const [soonModalTitle, setSoonModalTitle] = useState("Ferramentas Premium");
   const [downloadState, setDownloadState] = useState<DownloadState>({
@@ -810,11 +811,18 @@ export default function SwipeMax() {
                             <div className="mt-3">
                               <button
                                 type="button"
-                                onClick={() => setShowInvisibleModal(true)}
+                                onClick={() => {
+  if (!isAnnual) {
+    openPricingModal();
+    return;
+  }
+
+  setSelectedInvisibleVslId(offer.id);
+}}
                                 className="inline-flex h-[44px] w-full items-center justify-center gap-2 rounded-2xl border border-white/10 bg-white/[0.03] px-4 text-[12px] font-semibold text-zinc-300 transition-all duration-300 hover:border-white/15 hover:bg-white/[0.05]"
                               >
                                 <Sparkles className="h-4 w-4" />
-                                Estrutura Invisível - Em Breve
+                                ANÁLISE ESTRATÉGICA DA VSL
                               </button>
                             </div>
                           </div>
@@ -835,11 +843,12 @@ export default function SwipeMax() {
         <SwipeMaxPricingModal onClose={closePricingModal} />
       )}
 
-      {showInvisibleModal && (
-        <SwipeMaxInvisibleModal
-          onClose={() => setShowInvisibleModal(false)}
-        />
-      )}
+      {selectedInvisibleVslId !== null && (
+  <SwipeMaxInvisibleModal
+    vslId={selectedInvisibleVslId}
+    onClose={() => setSelectedInvisibleVslId(null)}
+  />
+)}
 
             {showSoonModal && (
         <div className="fixed inset-0 z-[120] flex items-center justify-center p-4">

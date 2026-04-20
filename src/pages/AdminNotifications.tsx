@@ -110,6 +110,7 @@ const AdminNotifications = () => {
   };
 
   const handleToggleActive = async (notification: AdminNotification) => {
+    console.log("CLIQUE TOGGLE", notification);
     const sb = supabase as any;
     const nextIsActive = notification.is_active === true ? false : true;
 
