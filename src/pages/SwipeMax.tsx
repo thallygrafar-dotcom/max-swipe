@@ -935,7 +935,7 @@ function DashboardHeroCard({
     <button
       type="button"
       onClick={onClick}
-className={`group relative overflow-hidden rounded-[32px] border ${isRadar ? "border-red-500/40 shadow-[0_0_0_1px_rgba(239,68,68,0.25),0_25px_80px_rgba(239,68,68,0.15)]" : "border-white/10"} bg-[linear-gradient(180deg,rgba(22,22,28,0.92)_0%,rgba(14,14,18,0.94)_100%)] p-5 text-left shadow-[0_24px_80px_rgba(0,0,0,0.28)] transition-all duration-300 hover:-translate-y-1 hover:border-red-500/20 md:p-7`}    >
+className="group relative overflow-hidden rounded-[32px] border border-white/10 bg-[linear-gradient(180deg,rgba(22,22,28,0.92)_0%,rgba(14,14,18,0.94)_100%)] p-5 text-left shadow-[0_24px_80px_rgba(0,0,0,0.28)] transition-all duration-300 hover:-translate-y-1 hover:border-red-500/20 md:p-7"    >
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.06),transparent_26%),radial-gradient(circle_at_bottom_right,rgba(239,68,68,0.08),transparent_20%)]" />
       <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/20 to-transparent" />
 
