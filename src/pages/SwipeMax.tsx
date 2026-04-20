@@ -509,7 +509,7 @@ export default function SwipeMax() {
                 badge={
                   <div className="inline-flex items-center gap-2 rounded-full border border-emerald-400/20 bg-emerald-400/[0.10] px-3 py-1 text-[11px] font-semibold text-emerald-200">
                     <Check className="h-3.5 w-3.5" />
-                    Acesso liberado
+                    Liberado
                   </div>
                 }
                 buttonLabel="Explorar Biblioteca"
